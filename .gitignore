@@ -1,0 +1,9 @@
+node_modules
+.next
+out
+.env*.local
+.DS_Store
+*.tsbuildinfo
+next-env.d.ts
+# local RSVP scratch storage (dev only — replaced by Supabase later)
+data/rsvps.json

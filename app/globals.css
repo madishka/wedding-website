@@ -1,0 +1,823 @@
+/* ————————————————————————————————————————————————
+   Madelaine & Philip · Save the Date
+   Moody editorial: dark aerial sea, warm greige, deep ink.
+   Type: Italiana (display) + Imperial Script (accents) + Jost (body).
+   ———————————————————————————————————————————————— */
+
+:root {
+  --paper: #f4f2ed; /* warm off-white */
+  --stone: #eae6dd; /* beige band */
+  --white: #ffffff;
+  --ink: #202b36; /* deep navy-charcoal */
+  --ink-2: #33414e;
+  --muted: #707a85;
+  --line: #d9d4c9;
+  --line-stone: #d2ccbf;
+  --field: #e8e5de; /* flat option buttons */
+  --field-border: #c9c5bb;
+  --sea-deep: #1c2e32;
+
+  --font-display: "Italiana";
+  --font-script: "Imperial Script";
+  --font-body: "Jost Variable";
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body), sans-serif;
+  font-weight: 300;
+  font-size: 1rem;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* faint film grain */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 90;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.container {
+  width: min(1160px, 92vw);
+  margin-inline: auto;
+}
+
+.center {
+  text-align: center;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.script {
+  font-family: var(--font-script), cursive;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* ——— shared type ——— */
+
+.eyebrow {
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.section-title {
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  font-size: clamp(2rem, 4.4vw, 3.4rem);
+  line-height: 1.1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: 0.9rem;
+}
+
+.section-intro {
+  max-width: 34rem;
+  margin: 1.2rem auto 0;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+/* ——— announcement banner ——— */
+
+.announcement {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.55rem 3rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 0.78rem;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.announcement button {
+  position: absolute;
+  right: 0.9rem;
+  border: 0;
+  background: none;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--paper);
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.announcement button:hover {
+  opacity: 1;
+}
+
+/* ——— hero ——— */
+
+/* Pinned: content sections slide over the hero like a curtain
+   (see also HeroMotion.tsx for the scroll-linked drift). */
+.hero {
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--white);
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: radial-gradient(
+      ellipse 56% 42% at 50% 44%,
+      rgba(15, 23, 27, 0.38),
+      rgba(15, 23, 27, 0) 72%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(18, 28, 32, 0.5),
+      rgba(18, 28, 32, 0.22) 40%,
+      rgba(18, 28, 32, 0.42) 100%
+    ),
+    url("/hero-sea.jpg");
+  background-size: cover;
+  background-position: center 62%;
+  will-change: transform;
+}
+
+.hero-inner {
+  will-change: transform, opacity;
+}
+
+.nav {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  width: min(1240px, 94vw);
+  margin: 1.6rem auto 0;
+  padding: 1rem 0.2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.nav a {
+  color: rgba(255, 255, 255, 0.88);
+  text-decoration: none;
+  font-size: 0.68rem;
+  font-weight: 400;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  transition: color 0.25s;
+}
+
+.nav a:hover {
+  color: var(--white);
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 1.25rem 5rem;
+  text-shadow: 0 2px 26px rgba(12, 20, 24, 0.5), 0 1px 8px rgba(12, 20, 24, 0.35);
+}
+
+.names {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  font-size: clamp(3.4rem, 10.5vw, 7.2rem);
+  line-height: 0.98;
+  letter-spacing: 0.05em;
+}
+
+.script-and {
+  font-family: var(--font-script), cursive;
+  text-transform: none;
+  font-size: 0.38em;
+  line-height: 0.9;
+  margin: 0.08em 0;
+  letter-spacing: 0;
+  opacity: 0.95;
+}
+
+.hero-sub {
+  margin-top: 2rem;
+  font-size: clamp(0.72rem, 1.4vw, 0.88rem);
+  font-weight: 400;
+  letter-spacing: 0.5em;
+  text-indent: 0.5em; /* balance the trailing tracking */
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.hero-rule {
+  display: block;
+  width: 4.5rem;
+  height: 1px;
+  margin-top: 1.6rem;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.hero-date {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  column-gap: 0.9em;
+  row-gap: 0.3em;
+  margin-top: 1.1rem;
+  font-size: clamp(0.66rem, 1.2vw, 0.78rem);
+  font-weight: 400;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.hero-date .sep {
+  letter-spacing: 0;
+  opacity: 0.7;
+}
+
+/* entrance animation */
+.enter {
+  opacity: 0;
+  transform: translateY(18px);
+  animation: rise 1s var(--ease) forwards;
+}
+
+.enter-1 { animation-delay: 0.15s; }
+.enter-2 { animation-delay: 0.35s; }
+.enter-3 { animation-delay: 0.55s; }
+.enter-4 { animation-delay: 0.85s; }
+.enter-5 { animation-delay: 1.05s; }
+
+@keyframes rise {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* scroll-triggered reveals */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ——— the weekend ——— */
+
+/* sections that ride over the pinned hero */
+.weekend,
+.travel,
+.rsvp,
+.footer {
+  position: relative;
+  z-index: 1;
+}
+
+.weekend {
+  padding: clamp(5rem, 10vw, 8.5rem) 0;
+  background: var(--paper);
+  box-shadow: 0 -28px 56px -18px rgba(15, 23, 27, 0.45);
+}
+
+.event-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 3.5rem;
+  align-items: stretch;
+}
+
+.event-grid .reveal {
+  height: 100%;
+}
+
+.event-card {
+  height: 100%;
+  padding: 2.8rem 1.9rem;
+  text-align: center;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: transparent;
+  transition: background 0.35s var(--ease), box-shadow 0.35s var(--ease),
+    transform 0.35s var(--ease);
+}
+
+.event-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 22px 44px -26px rgba(32, 43, 54, 0.35);
+}
+
+.event-card:not(.featured):hover {
+  background: var(--white);
+}
+
+.event-date {
+  font-size: 0.68rem;
+  letter-spacing: 0.36em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.event-card h3 {
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  font-size: 1.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  margin-top: 0.9rem;
+}
+
+.event-card .event-body {
+  margin-top: 1rem;
+  font-size: 0.87rem;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+/* the wedding day, given center stage */
+.event-card.featured {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--white);
+}
+
+.event-card.featured .event-date {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.event-card.featured .event-body {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* ——— travel & stay ——— */
+
+.travel {
+  background: var(--stone);
+  padding: clamp(5rem, 10vw, 8rem) 0;
+}
+
+.travel-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.4rem 3rem;
+  margin-top: 3.2rem;
+}
+
+.travel-block {
+  border-top: 1px solid var(--ink);
+  padding-top: 1.4rem;
+}
+
+.travel-block h3 {
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  font-size: 1.25rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.travel-block p {
+  margin-top: 0.8rem;
+  font-size: 0.88rem;
+  line-height: 1.75;
+  color: var(--muted);
+}
+
+.travel-note {
+  font-weight: 400;
+  color: var(--ink-2) !important;
+}
+
+/* where to stay */
+
+.stay {
+  margin-top: clamp(4rem, 7vw, 6rem);
+  text-align: center;
+}
+
+.stay-title {
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.stay-intro {
+  max-width: 32rem;
+  margin: 0.9rem auto 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.hotel-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 2.4rem;
+  align-items: stretch;
+}
+
+.hotel-grid .reveal {
+  height: 100%;
+}
+
+.hotel-card {
+  height: 100%;
+  padding: 2.2rem 1.7rem;
+  background: var(--white);
+  border: 1px solid var(--line-stone);
+  border-radius: 2px;
+  transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
+}
+
+.hotel-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 22px 44px -26px rgba(32, 43, 54, 0.35);
+}
+
+.hotel-town {
+  font-size: 0.64rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.hotel-card h4 {
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  font-size: 1.35rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 0.7rem;
+}
+
+.hotel-body {
+  margin-top: 0.8rem;
+  font-size: 0.86rem;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.stay-note {
+  max-width: 34rem;
+  margin: 2.2rem auto 0;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
+/* ——— rsvp ——— */
+
+.rsvp {
+  background: var(--white);
+  padding: clamp(5rem, 10vw, 8.5rem) 0;
+}
+
+.rsvp-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: clamp(3rem, 7vw, 6.5rem);
+  align-items: start;
+}
+
+.rsvp-title {
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  font-size: clamp(2.8rem, 5.5vw, 4.4rem);
+  line-height: 1.02;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.rsvp-title .script {
+  font-size: 0.62em;
+  margin-left: 0.12em;
+}
+
+.rsvp-date {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.8rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.rsvp-date .day {
+  font-family: var(--font-display), serif;
+  font-size: 2rem;
+  letter-spacing: 0.05em;
+}
+
+.rsvp-date .bar {
+  width: 1px;
+  height: 2.4rem;
+  background: var(--ink);
+  opacity: 0.55;
+}
+
+.rsvp-note {
+  margin-top: 1.4rem;
+  max-width: 24rem;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+/* form */
+
+.field {
+  margin-bottom: 1.35rem;
+  border: 0;
+}
+
+.field label,
+.field legend {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: var(--ink-2);
+  margin-bottom: 0.45rem;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  font: inherit;
+  font-weight: 300;
+  color: var(--ink);
+  background: var(--white);
+  border: 1px solid var(--field-border);
+  border-radius: 3px;
+  padding: 0.7rem 0.85rem;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.field input:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--ink);
+  box-shadow: 0 0 0 3px rgba(32, 43, 54, 0.12);
+}
+
+.field textarea {
+  resize: vertical;
+}
+
+.option-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.option {
+  font: inherit;
+  font-weight: 400;
+  font-size: 0.92rem;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: var(--field);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.22s var(--ease);
+}
+
+.option:hover {
+  border-color: var(--ink);
+}
+
+.option.selected {
+  background: var(--ink);
+  color: var(--white);
+}
+
+.submit {
+  width: 100%;
+  font: inherit;
+  font-weight: 400;
+  font-size: 0.82rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  padding: 0.9rem;
+  border: 0;
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--white);
+  cursor: pointer;
+  transition: background 0.25s, transform 0.25s var(--ease);
+}
+
+.submit:hover:not(:disabled) {
+  background: var(--ink-2);
+  transform: translateY(-1px);
+}
+
+.submit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.fine-print {
+  margin-top: 0.9rem;
+  text-align: center;
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+
+.form-error {
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: #9c3a32;
+}
+
+.rsvp-success {
+  padding: 3rem 1rem;
+  text-align: center;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+}
+
+.rsvp-success h3 {
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  font-size: 2.6rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.rsvp-success h3 .script {
+  font-size: 0.72em;
+  margin-left: 0.15em;
+}
+
+.rsvp-success p {
+  margin: 1rem auto 0;
+  max-width: 26rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* ——— footer ——— */
+
+.footer {
+  border-top: 1px solid var(--line);
+  padding: clamp(3.5rem, 6vw, 5rem) 0 3rem;
+  text-align: center;
+  background: var(--paper);
+}
+
+.monogram-img {
+  display: block;
+  width: 180px;
+  height: auto;
+  margin-inline: auto;
+}
+
+.footer-date {
+  margin-top: 0.6rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.whatsapp-chip {
+  display: inline-block;
+  margin-top: 1.5rem;
+  padding: 0.6rem 1.4rem;
+  border: 1px solid var(--ink);
+  border-radius: 6px;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: all 0.25s var(--ease);
+}
+
+.whatsapp-chip:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.footer-note {
+  margin-top: 1.8rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ——— responsive ——— */
+
+@media (max-width: 900px) {
+  .rsvp-grid {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .rsvp-copy {
+    text-align: center;
+  }
+
+  .rsvp-date {
+    justify-content: center;
+  }
+
+  .rsvp-note {
+    margin-inline: auto;
+  }
+
+  .event-grid,
+  .travel-grid,
+  .hotel-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .nav {
+    gap: 0.8rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding-bottom: 0.8rem;
+  }
+
+  .nav a {
+    font-size: 0.6rem;
+    letter-spacing: 0.24em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .enter,
+  .reveal {
+    opacity: 1;
+    transform: none;
+    animation: none;
+    transition: none;
+  }
+}
