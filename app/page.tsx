@@ -1,23 +1,38 @@
-import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import { Hero } from "@/components/Hero";
-import { Rsvp } from "@/components/Rsvp";
-import { TravelStay } from "@/components/TravelStay";
-import { Weekend } from "@/components/Weekend";
 import { siteConfig } from "@/lib/site-config";
 
+/**
+ * The public front door.
+ *
+ * Anyone who has the bare URL lands here, so it says only that the two
+ * of them are getting married. No date, no island, no venues, no
+ * itinerary, no RSVP. Everything else is behind a household's link.
+ */
 export default function Page() {
-  const { couple, dateLabel, placeLabel, whatsappGroupUrl, announcement } =
-    siteConfig;
+  const { couple } = siteConfig;
 
   return (
     <>
-      <AnnouncementBanner message={announcement} />
       <main>
-        <Hero />
-        <Weekend />
-        <TravelStay />
-        <Rsvp />
+        <Hero showDetails={false} />
+
+        <section className="gate" id="enter">
+          <div className="container">
+            <p className="eyebrow center">The details</p>
+            <h2 className="section-title center">By invitation</h2>
+            <p className="section-intro center">
+              Everything about the weekend — where, when, and how to reply —
+              lives behind the personal link we sent you. Open that link and
+              you're in; your device will remember it afterwards.
+            </p>
+            <p className="fine-print center">
+              Can't find yours, or think you should have one? Message us and
+              we'll send it over.
+            </p>
+          </div>
+        </section>
       </main>
+
       <footer className="footer">
         <div className="container footer-inner">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -28,20 +43,7 @@ export default function Page() {
             width={640}
             height={441}
           />
-          <p className="footer-date">
-            {dateLabel} · {placeLabel}
-          </p>
-          {whatsappGroupUrl && (
-            <a
-              className="whatsapp-chip"
-              href={whatsappGroupUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Join the WhatsApp group
-            </a>
-          )}
-          <p className="footer-note">Full website &amp; details to follow</p>
+          <p className="footer-note">By invitation only</p>
         </div>
       </footer>
     </>

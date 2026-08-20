@@ -7,3 +7,7 @@ out
 next-env.d.ts
 # local RSVP scratch storage (dev only — replaced by Supabase later)
 data/rsvps.json
+# real guest list + the minted private links — never commit these
+scripts/guests.csv
+scripts/out/
+.gstack/

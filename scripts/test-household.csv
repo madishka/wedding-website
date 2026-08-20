@@ -1,0 +1,5 @@
+household,contact_email,contact_phone,invited_via,events,guest_name,guest_type,notes
+ZZ Test Household,test@example.com,,email,"boat-party;wedding;pool-party",Test Adult One,adult,DELETE ME before going live
+ZZ Test Household,,,,,Test Adult Two,adult,
+ZZ Test Household,,,,,Test Child,child,
+ZZ Test Household,,,,,,plus_one,unnamed slot

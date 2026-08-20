@@ -5,10 +5,16 @@ import "@fontsource/imperial-script"; // script accents ("and", "by")
 import "@fontsource-variable/jost"; // body
 import "./globals.css";
 
+/**
+ * Deliberately says nothing about when or where.
+ *
+ * The title is what shows in a browser tab and — more importantly — in
+ * the link preview whenever someone pastes the URL into WhatsApp or
+ * iMessage. Those previews get forwarded. Details live behind a token.
+ */
 export const metadata: Metadata = {
-  title: "Madelaine & Philip · July 24, 2027 · Santorini",
-  description:
-    "Save the date — Madelaine and Philip are getting married on July 24, 2027 in Santorini, Greece.",
+  title: "Madelaine & Philip",
+  description: "Madelaine and Philip are getting married.",
   icons: { icon: "/icon.svg" },
   manifest: "/manifest.webmanifest",
   robots: { index: false, follow: false }, // keep the site out of search results

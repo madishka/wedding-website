@@ -1,4 +1,5 @@
 import { Reveal } from "./Reveal";
+import { siteConfig } from "@/lib/site-config";
 
 const GETTING_THERE = [
   {
@@ -35,7 +36,19 @@ const HOTELS = [
   },
 ];
 
+/**
+ * Two halves that firm up on different timelines.
+ *
+ * "Getting there" is evergreen — JTR, the ferries, and the fact that we
+ * run the shuttles. True now, true in a year. "Where to stay" depends on
+ * room blocks that don't exist yet, so it stays off: a guest who books
+ * against a recommendation you later change has either overpaid or has
+ * to cancel. Both are toggled in lib/site-config.ts.
+ */
 export function TravelStay() {
+  const { gettingThere, whereToStay } = siteConfig.sections;
+  if (!gettingThere && !whereToStay) return null;
+
   return (
     <section className="travel" id="travel">
       <div className="container">
@@ -43,6 +56,7 @@ export function TravelStay() {
           <p className="eyebrow center">Travel &amp; stay</p>
           <h2 className="section-title center">Getting to Santorini</h2>
         </Reveal>
+        {gettingThere && (
         <div className="travel-grid">
           {GETTING_THERE.map((block, i) => (
             <Reveal key={block.title} delay={i * 90}>
@@ -54,7 +68,21 @@ export function TravelStay() {
             </Reveal>
           ))}
         </div>
+        )}
 
+        {/* Until room blocks exist, tell guests plainly not to book yet —
+            it is the single most useful thing this section can say. */}
+        {gettingThere && !whereToStay && (
+          <Reveal delay={140}>
+            <p className="stay-note center">
+              We&apos;re still sorting hotel blocks and recommendations —
+              those come with the full invitation in the autumn. No need to
+              book anywhere to stay just yet.
+            </p>
+          </Reveal>
+        )}
+
+        {whereToStay && (
         <div className="stay">
           <Reveal>
             <h3 className="stay-title">Where to stay</h3>
@@ -82,6 +110,7 @@ export function TravelStay() {
             </p>
           </Reveal>
         </div>
+        )}
       </div>
     </section>
   );

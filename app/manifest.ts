@@ -7,10 +7,10 @@ import type { MetadataRoute } from "next";
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Madelaine & Philip — Santorini 2027",
-    short_name: "M & P 2027",
-    description:
-      "Save the date — July 24, 2027 in Santorini, Greece.",
+    name: "Madelaine & Philip",
+    short_name: "M & P",
+    // No date or location: the manifest is served on the public root.
+    description: "Madelaine and Philip are getting married.",
     start_url: "/",
     display: "standalone",
     background_color: "#F4F2ED",

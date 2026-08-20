@@ -180,6 +180,33 @@ body::after {
   will-change: transform;
 }
 
+/*
+  Public-root variant: no photograph.
+  The caldera shot is recognisable — anyone who has been to Santorini, or
+  who reverse-image-searches it, learns the location from the picture
+  alone. The root page keeps the palette and the mood, and says nothing.
+*/
+.hero-bg-plain {
+  background-image:
+    radial-gradient(
+      ellipse 70% 55% at 50% 30%,
+      rgba(96, 128, 142, 0.42),
+      rgba(96, 128, 142, 0) 70%
+    ),
+    radial-gradient(
+      ellipse 90% 60% at 50% 100%,
+      rgba(8, 16, 22, 0.85),
+      rgba(8, 16, 22, 0) 75%
+    ),
+    linear-gradient(
+      to bottom,
+      #2b3f4a 0%,
+      #1d2e38 32%,
+      #132029 60%,
+      #0b141b 100%
+    );
+}
+
 .hero-inner {
   will-change: transform, opacity;
 }
@@ -319,9 +346,11 @@ body::after {
 /* ——— the weekend ——— */
 
 /* sections that ride over the pinned hero */
+.welcome,
 .weekend,
 .travel,
 .rsvp,
+.gate,
 .footer {
   position: relative;
   z-index: 1;
@@ -521,9 +550,53 @@ body::after {
   color: var(--muted);
 }
 
+/* ——— welcome note ——— */
+
+.welcome {
+  /* stone → paper (weekend) → stone (travel) → white (rsvp) keeps the
+     bands alternating as sections get switched on and off. */
+  background: var(--stone);
+  padding: clamp(5rem, 10vw, 8.5rem) 0;
+}
+
+.welcome-body {
+  max-width: 46ch;
+  margin: clamp(2rem, 4vw, 3rem) auto 0;
+  text-align: center;
+}
+
+.welcome-body p {
+  margin: 0 0 1.25rem;
+  line-height: 1.75;
+}
+
+.welcome-signoff {
+  font-family: "Imperial Script", cursive;
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  line-height: 1.2;
+  /* The script face has very tight sidebearings, so the default word
+     space collapses and it reads "Madelaine&Philip". */
+  word-spacing: 0.25em;
+  margin-top: clamp(1.5rem, 3vw, 2.25rem) !important;
+}
+
+.welcome-aside {
+  max-width: 52ch;
+  margin: clamp(2.5rem, 5vw, 4rem) auto 0;
+  padding-top: clamp(1.75rem, 3.5vw, 2.5rem);
+  border-top: 1px solid var(--line-stone);
+  text-align: center;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  opacity: 0.75;
+}
+
 /* ——— rsvp ——— */
 
-.rsvp {
+/* .gate is the public root's "by invitation" panel — same treatment,
+   but the page has no RSVP on it, so it doesn't claim to. */
+.rsvp,
+.gate {
   background: var(--white);
   padding: clamp(5rem, 10vw, 8.5rem) 0;
 }

@@ -1,0 +1,7 @@
+household,contact_email,contact_phone,invited_via,events,guest_name,guest_type,notes
+Eric & Rebecca Chen,eric@example.com,+15551234567,whatsapp,"boat-party;wedding;pool-party",Eric Chen,adult,
+Eric & Rebecca Chen,,,,,Rebecca Chen,adult,
+Eric & Rebecca Chen,,,,,Mia Chen,child,turns 8 before the wedding
+Aunt Sofia,sofia@example.com,,email,"wedding;pool-party",Sofia Marino,adult,family only
+Tom Whitfield,tom@example.com,,email,wedding,Tom Whitfield,adult,
+Tom Whitfield,,,,,,plus_one,name to come at RSVP
