@@ -15,22 +15,6 @@ export default function Page() {
     <>
       <main>
         <Hero showDetails={false} />
-
-        <section className="gate" id="enter">
-          <div className="container">
-            <p className="eyebrow center">The details</p>
-            <h2 className="section-title center">By invitation</h2>
-            <p className="section-intro center">
-              Everything about the weekend — where, when, and how to reply —
-              lives behind the personal link we sent you. Open that link and
-              you're in; your device will remember it afterwards.
-            </p>
-            <p className="fine-print center">
-              Can't find yours, or think you should have one? Message us and
-              we'll send it over.
-            </p>
-          </div>
-        </section>
       </main>
 
       <footer className="footer">

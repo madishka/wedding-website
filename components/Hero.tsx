@@ -1,4 +1,5 @@
 import { siteConfig } from "@/lib/site-config";
+import { EmblemHero } from "./EmblemHero";
 import { HeroMotion } from "./HeroMotion";
 
 /** Built from the visible sections, so the nav never links to a section
@@ -49,15 +50,24 @@ export function Hero({ showDetails = true }: { showDetails?: boolean }) {
       )}
 
       <div className="hero-inner">
-        <h1 className="names">
-          <span className="name enter enter-1">{couple.partnerA}</span>
-          <span className="script-and enter enter-2" aria-hidden="true">
-            and
-          </span>
-          <span className="visually-hidden">and</span>
-          <span className="name enter enter-3">{couple.partnerB}</span>
-        </h1>
-        <p className="hero-sub enter enter-4">Are getting married</p>
+        {showDetails ? (
+          <h1 className="names">
+            <span className="name enter enter-1">{couple.partnerA}</span>
+            <span className="script-and enter enter-2" aria-hidden="true">
+              and
+            </span>
+            <span className="visually-hidden">and</span>
+            <span className="name enter enter-3">{couple.partnerB}</span>
+          </h1>
+        ) : (
+          <>
+            <EmblemHero />
+            <span className="visually-hidden">
+              {couple.partnerA} and {couple.partnerB} are getting married
+            </span>
+          </>
+        )}
+        {showDetails && <p className="hero-sub enter enter-4">Are getting married</p>}
         {showDetails && (
           <>
             <span className="hero-rule enter enter-5" aria-hidden="true" />

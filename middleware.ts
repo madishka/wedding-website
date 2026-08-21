@@ -73,6 +73,6 @@ function noindex(res: NextResponse): NextResponse {
 export const config = {
   matcher: [
     // Everything except Next internals and static files in /public.
-    "/((?!_next/static|_next/image|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf)$).*)",
+    "/((?!_next/static|_next/image|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf|glb)$).*)",
   ],
 };
