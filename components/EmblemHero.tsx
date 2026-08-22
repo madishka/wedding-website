@@ -4,11 +4,17 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
+
 /**
- * The public root's hero mark: the emblem GLB, slowly and continuously
- * spinning on its Y axis. Transparent canvas, so `.hero-bg-plain` (see
- * globals.css) shows through behind it exactly as it does behind the
- * text it replaces.
+ * The public root's hero mark: the emblem GLB, turning on its Y axis
+ * as the page scrolls through `.emblem-scroll-space` (see page.tsx) —
+ * 0° at the top of that space, 180° once it's fully scrolled past, and
+ * pinned at 180° for any scroll beyond that. Transparent canvas, so
+ * `.hero-bg-plain` (see globals.css) shows through behind it exactly
+ * as it does behind the text it replaces.
  */
 export function EmblemHero() {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -56,17 +62,21 @@ export function EmblemHero() {
       // before the continuous Y-axis spin takes over. The extra 180°
       // on Y corrects it facing away/backwards after that fix-up.
       model.rotation.x = Math.PI / 2;
-
-      // Center the model on its own origin and normalize its scale so
-      // it fills the frame consistently regardless of how it was
-      // authored. Computed after the fix-up rotation above, so the
-      // box reflects the model's actual on-screen orientation.
-      const box = new THREE.Box3().setFromObject(model);
-      const size = box.getSize(new THREE.Vector3());
-      const center = box.getCenter(new THREE.Vector3());
-      model.position.sub(center);
-      const maxDim = Math.max(size.x, size.y, size.z) || 1;
+      model.rotation.z = Math.PI;
+      // Normalize scale so the model fills the frame consistently
+      // regardless of how it was authored, then center it — in that
+      // order, so the recentering below measures (and cancels out)
+      // the model's actual final centroid instead of its unscaled
+      // one. The sickle's handle throws the geometric center off from
+      // (0,0,0), so centering before scaling left a residual offset
+      // proportional to the scale factor: it visibly rotated around
+      // the handle rather than the emblem's true center.
+      const rawSize = new THREE.Box3().setFromObject(model).getSize(new THREE.Vector3());
+      const maxDim = Math.max(rawSize.x, rawSize.y, rawSize.z) || 1;
       model.scale.setScalar(2.4 / maxDim);
+
+      const center = new THREE.Box3().setFromObject(model).getCenter(new THREE.Vector3());
+      model.position.sub(center);
 
       emblem.add(model);
     });
@@ -81,17 +91,42 @@ export function EmblemHero() {
     window.addEventListener("resize", resize);
     resize();
 
-    const reduceMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-    const ROTATION_SPEED = 0.25; // radians/sec — slow, continuous
+    const scrollSpace = document.querySelector<HTMLElement>(
+      ".emblem-scroll-space"
+    );
+    const footerOverlay = document.querySelector<HTMLElement>(
+      ".hero-footer-overlay"
+    );
+    const scrollCue = document.querySelector<HTMLElement>(".scroll-cue");
+
+    function scrollProgress() {
+      if (!scrollSpace) return 0;
+      // The hero is the page's first element (static top offset 0), so
+      // it's pinned from scrollY 0 onward — not from whenever the
+      // scroll-space's own top happens to cross the viewport's top
+      // edge, which only happens after an extra full viewport of
+      // scrolling. The pin lasts exactly the scroll-space's height.
+      const total = scrollSpace.offsetHeight || 1;
+      return clamp(window.scrollY, 0, total) / total;
+    }
 
     let raf = 0;
-    let last = performance.now();
-    function tick(now: number) {
-      const dt = (now - last) / 1000;
-      last = now;
-      if (!reduceMotion) emblem.rotation.y += ROTATION_SPEED * dt;
+    function tick() {
+      const progress = scrollProgress();
+      emblem.rotation.y = progress * Math.PI; // 0 -> 180°, then holds
+
+      // Monogram overlay: starts fading in once the emblem is halfway
+      // turned (90°) and is fully in by the time it finishes (180°).
+      if (footerOverlay) {
+        footerOverlay.style.opacity = String(clamp(progress - 0.5, 0, 0.5) / 0.5);
+      }
+
+      // Scroll cue: gone within the first sliver of scrolling, well
+      // before the footer overlay above needs the same spot.
+      if (scrollCue) {
+        scrollCue.style.opacity = String(1 - clamp(progress / 0.08, 0, 1));
+      }
+
       renderer.render(scene, camera);
       raf = requestAnimationFrame(tick);
     }

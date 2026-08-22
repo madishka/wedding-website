@@ -10,8 +10,14 @@ import { useEffect } from "react";
  *   - the backdrop slowly zooms and sinks
  * Transform/opacity only (compositor-friendly), rAF-throttled, and
  * disabled entirely for prefers-reduced-motion.
+ *
+ * `fadeContent` gates the text drift/fade only. The public root's
+ * emblem (EmblemHero, also inside `.hero-inner`) has its own
+ * scroll-driven rotation and must stay centered and fully opaque for
+ * the whole scroll runway, so Hero.tsx passes `fadeContent={false}`
+ * there — the backdrop zoom still applies in both modes.
  */
-export function HeroMotion() {
+export function HeroMotion({ fadeContent = true }: { fadeContent?: boolean }) {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
@@ -25,8 +31,10 @@ export function HeroMotion() {
       const vh = window.innerHeight;
       const y = Math.min(window.scrollY, vh);
       const p = y / vh; // 0 → 1 across the first viewport
-      inner.style.transform = `translate3d(0, ${y * -0.28}px, 0)`;
-      inner.style.opacity = String(1 - p * 0.85);
+      if (fadeContent) {
+        inner.style.transform = `translate3d(0, ${y * -0.28}px, 0)`;
+        inner.style.opacity = String(1 - p * 0.85);
+      }
       // keep the drift smaller than what the zoom covers, so no edge gap
       bg.style.transform = `translate3d(0, ${y * 0.025}px, 0) scale(${1 + p * 0.06})`;
     };
@@ -42,7 +50,7 @@ export function HeroMotion() {
       window.removeEventListener("resize", onScroll);
       if (raf) cancelAnimationFrame(raf);
     };
-  }, []);
+  }, [fadeContent]);
 
   return null;
 }

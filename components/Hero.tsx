@@ -28,7 +28,7 @@ export function Hero({ showDetails = true }: { showDetails?: boolean }) {
   const { couple, dateLabel, placeLabel } = siteConfig;
   return (
     <section className="hero" id="top">
-      <HeroMotion />
+      <HeroMotion fadeContent={showDetails} />
       {/*
         Backdrop: public/hero-sea.jpg (procedurally generated abstract
         aerial sea). Drop in any dark moody image at the same path to
@@ -81,6 +81,56 @@ export function Hero({ showDetails = true }: { showDetails?: boolean }) {
           </>
         )}
       </div>
+
+      {/* Fades in as the emblem finishes its turn (see EmblemHero.tsx) —
+          an overlay inside the pinned hero, not a section after it, so
+          the hero never scrolls away to reveal it. */}
+      {!showDetails && (
+        <div className="hero-footer-overlay">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className="monogram-img"
+            src="/monogram.png"
+            alt={`${couple.partnerA[0]} & ${couple.partnerB[0]} monogram`}
+            width={640}
+            height={441}
+          />
+          <p className="footer-note">By invitation only</p>
+        </div>
+      )}
+
+      {/* Nudges people to scroll — the emblem's turn is the only hint
+          otherwise that the page does anything. Fades out as soon as
+          scrolling starts (see EmblemHero.tsx), well before the
+          footer overlay above occupies the same spot. */}
+      {!showDetails && (
+        <div className="scroll-cue" aria-hidden="true">
+          <span className="scroll-cue-label">Scroll</span>
+          <svg
+            className="scroll-cue-chevrons"
+            width="22"
+            height="22"
+            viewBox="0 0 22 22"
+            fill="none"
+          >
+            <path
+              d="M2 2L11 9L20 2"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              opacity="0.5"
+            />
+            <path
+              d="M2 11L11 18L20 11"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
+      )}
     </section>
   );
 }

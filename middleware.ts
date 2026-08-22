@@ -49,6 +49,14 @@ export function middleware(req: NextRequest) {
     return noindex(NextResponse.next());
   }
 
+  // Dev-only preview of the full site with mock data, no Supabase or
+  // real token needed — see app/preview/page.tsx. That page 404s itself
+  // outside development; this just keeps the gate from redirecting it
+  // away before it gets the chance to.
+  if (pathname === "/preview" && process.env.NODE_ENV !== "production") {
+    return noindex(NextResponse.next());
+  }
+
   // Everything else is behind the gate.
   const cookie = req.cookies.get(TOKEN_COOKIE)?.value;
   if (cookie && TOKEN_RE.test(cookie)) {
