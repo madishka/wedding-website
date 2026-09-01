@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mintToken, parseCsv, normalizeKey, ALPHABET, TOKEN_LENGTH }
+import { mintToken, parseCsv, normalizeKey, toCsvUrl, ALPHABET, TOKEN_LENGTH }
   from "./import-utils.mjs";
 
 test("parseCsv keeps commas inside quoted fields", () => {
@@ -67,5 +67,40 @@ test("mintToken is not biased toward the start of the alphabet", () => {
   for (const [char, n] of counts) {
     const drift = Math.abs(n - expected) / expected;
     assert.ok(drift < 0.08, `"${char}" drifted ${(drift * 100).toFixed(1)}%`);
+  }
+});
+
+test("toCsvUrl turns a Sheets edit link into a CSV export link", () => {
+  assert.equal(
+    toCsvUrl("https://docs.google.com/spreadsheets/d/1AbC-dEf_gH/edit#gid=0"),
+    "https://docs.google.com/spreadsheets/d/1AbC-dEf_gH/export?format=csv&gid=0"
+  );
+});
+
+test("toCsvUrl keeps the tab the URL actually points at", () => {
+  // The failure this guards against is silent: lose the gid and you import
+  // whichever sheet happens to be first, not the one you opened.
+  for (const [url, gid] of [
+    ["https://docs.google.com/spreadsheets/d/ID/edit#gid=123456", "123456"],
+    ["https://docs.google.com/spreadsheets/d/ID/edit?gid=789#gid=789", "789"],
+    ["https://docs.google.com/spreadsheets/d/ID/export?format=csv&gid=42", "42"],
+  ]) {
+    assert.equal(toCsvUrl(url).endsWith(`gid=${gid}`), true, url);
+  }
+});
+
+test("toCsvUrl defaults to the first tab when no gid is given", () => {
+  assert.equal(
+    toCsvUrl("https://docs.google.com/spreadsheets/d/ID/edit"),
+    "https://docs.google.com/spreadsheets/d/ID/export?format=csv&gid=0"
+  );
+});
+
+test("toCsvUrl leaves a non-Sheets URL alone", () => {
+  for (const url of [
+    "https://example.com/guests.csv",
+    "https://raw.githubusercontent.com/x/y/main/list.csv",
+  ]) {
+    assert.equal(toCsvUrl(url), url);
   }
 });

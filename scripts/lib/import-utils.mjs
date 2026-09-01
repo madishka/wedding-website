@@ -58,3 +58,23 @@ export function normalizeKey(raw) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 }
+
+/**
+ * A Google Sheets "edit" URL → the CSV export of the tab it points at.
+ *
+ * The gid matters: it identifies WHICH TAB. Defaulting it away would
+ * silently import the first sheet in the workbook no matter which one the
+ * URL named, so a second tab of notes could quietly replace the guest list.
+ *
+ * Any non-Sheets URL is returned untouched, so a raw CSV link works too.
+ */
+export function toCsvUrl(source) {
+  const m = String(source).match(
+    /docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/
+  );
+  if (!m) return source;
+  // On an edit link the tab id is in the fragment; elsewhere it's a query
+  // parameter. Both are covered rather than assuming one shape.
+  const gid = String(source).match(/[#&?]gid=([0-9]+)/)?.[1] ?? "0";
+  return `https://docs.google.com/spreadsheets/d/${m[1]}/export?format=csv&gid=${gid}`;
+}

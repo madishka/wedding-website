@@ -41,11 +41,12 @@ npm run check
 | `lib/unlock.ts` | Mints and verifies that cookie; throttles guessing |
 | `scripts/lib/password-utils.mjs` | scrypt hashing — shared with the importer, so the format can't drift |
 | `scripts/set-password.mjs` | `npm run password` — set, clear, or list passwords |
+| `scripts/guests.template.csv` | Import this into Google Sheets to start your guest list |
 | `components/SoftRsvp.tsx` | Wave-one reply — household-level, non-binding |
 | `app/api/soft-rsvp/route.ts` | Saves it; identifies the household from the cookie |
 | `lib/party.ts` | Looks a household up by token, with their events and RSVPs |
 | `lib/supabase.ts` | Server-only client (service role key) |
-| `scripts/import-guests.mjs` | Guest list CSV → Supabase, idempotent, mints links |
+| `scripts/import-guests.mjs` | Guest list CSV (or Google Sheet URL) → Supabase, idempotent, mints links |
 
 
 ## Setting up Supabase (one time, ~5 minutes)
@@ -68,41 +69,97 @@ security — it is server-only and must never reach the browser.
 
 ## The guest list
 
-The list lives in a spreadsheet, not in code. One row per **guest**, with
-a `household` column grouping them — household-level fields (contact,
-events) only need filling on the first row of each household.
+The list lives in a spreadsheet, not in code. **One row per person**, with a
+`Household` column grouping them — everyone sharing a household gets one
+link between them.
 
-```csv
-household,contact_email,contact_phone,invited_via,events,guest_name,guest_type,notes
-Eric & Rebecca Chen,eric@example.com,+15551234567,whatsapp,"boat-party;wedding;pool-party",Eric Chen,adult,
-Eric & Rebecca Chen,,,,,Rebecca Chen,adult,
-Eric & Rebecca Chen,,,,,Mia Chen,child,
-```
+### Setting up the Google Sheet
 
-That is one party, one link, three guests, three individual meal choices.
+1. `scripts/guests.template.csv` is the starting point. In Google Sheets:
+   **File → Import → Upload**, pick that file, and choose *Replace spreadsheet*.
+2. Delete the EXAMPLE rows. Keep the header row exactly as it is.
+3. Fill it in.
 
-`guest_type` is `adult` / `child` / `infant` / `plus_one`. Leave
-`guest_name` blank for an unnamed plus-one slot the guest fills in
-themselves at RSVP time. `events` are slugs, separated by `;`.
+The columns:
+
+| Column | Needed? | What it does |
+| --- | --- | --- |
+| `Household` | **yes** | Groups people onto one link. Repeat it on every row of that household. |
+| `Guest Name` | **yes** | One row per person. Blank only for an unnamed plus-one. |
+| `Guest Type` | | `adult` / `child` / `infant` / `plus_one`. Defaults to `adult`. |
+| `Contact Email` | | Where the real invitation goes. First row of the household only. |
+| `Contact Phone` | | First row of the household only. |
+| `Invited Via` | | `whatsapp` / `email` / `sms` — just a note to yourself. |
+| `Events` | | Slugs separated by `;` — `wedding;boat-party`. See below. |
+| `Notes` | | Anything. Never shown to guests. |
+
+Three rules the importer enforces, so it's worth knowing them up front:
+
+- **Household-level fields only need filling on the first row** of each
+  household. Leave them blank on the rest.
+- **The household name is the identity.** Re-importing matches on it, so
+  editing the sheet updates in place instead of duplicating. Change a
+  household's *name* and you create a second household with a second link.
+- **A blank `Guest Name` is only allowed when `Guest Type` is `plus_one`.**
+  That's how you add a "+1" whose name you don't know yet — they show up in
+  the welcome note as "and guest".
+
+`Events` is optional while the site shows the weekend as an outline (see
+`weekendDetail` in `lib/site-config.ts`), because nobody sees per-event
+detail yet. Filling it in now is still worth doing: it's what `party_events`
+records, and it's what the per-event itinerary switches on later. Putting
+`wedding` on everyone is a fine starting point.
+
+### Getting it into Supabase
+
+Check the spreadsheet before it touches the database — this reads it and
+validates it without connecting to Supabase at all:
 
 ```bash
-cp scripts/guests.sample.csv scripts/guests.csv   # then edit it
-npm run import:guests -- --check                  # read the CSV, no database
-npm run import:guests -- --dry-run                # show what would change
-npm run import:guests                             # apply
+npm run import:guests -- --check
+npm run import:guests -- --dry-run   # what would change
+npm run import:guests                # apply
 ```
 
-The import is **idempotent** — households are matched on a normalized
-name, so editing the spreadsheet and re-running updates in place.
-**Tokens are minted once and never regenerated**, so re-importing will
-never invalidate a link you have already sent.
+Two ways to point it at your sheet.
 
-Guests removed from the CSV are reported but kept, because deleting a
+**Download it** — no sharing settings to change, and the safest default:
+
+```bash
+# Sheets: File → Download → Comma-separated values (.csv)
+mv ~/Downloads/your-sheet.csv scripts/guests.csv
+npm run import:guests
+```
+
+**Or read the Sheet directly**, so there's nothing to re-download when the
+list changes:
+
+```bash
+npm run import:guests -- "https://docs.google.com/spreadsheets/d/YOUR_ID/edit#gid=0"
+```
+
+This needs the Sheet set to **Share → Anyone with the link → Viewer**, and
+that deserves a moment's thought: the spreadsheet is your entire guest list,
+with everyone's email and phone number in it. Link-viewable means public to
+anyone who ends up with the URL. If that's not a trade you want, download it
+instead — the result is identical.
+
+> The template has **no password column**, deliberately. Set passwords with
+> `npm run password -- --all` so they never live in a document you might
+> share. The importer still supports a `Password` column if you want it —
+> see the next section.
+
+The import is **idempotent** — households are matched on a normalized name,
+so editing the spreadsheet and re-running updates in place. **Tokens are
+minted once and never regenerated**, so re-importing will never invalidate a
+link you have already sent.
+
+Guests removed from the sheet are reported but kept, because deleting a
 guest also deletes their RSVPs. Pass `--prune` to actually remove them.
 
-Every run writes `scripts/out/links.csv` — each household with its
-private link, ready to paste into WhatsApp or a mail merge. That file is
-gitignored; it is the keys to the site.
+Every run writes `scripts/out/links.csv` — each household with its private
+link, ready to paste into WhatsApp or a mail merge. That file is gitignored;
+it is the keys to the site.
 
 ## Setting and changing passwords
 

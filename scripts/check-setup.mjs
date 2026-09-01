@@ -151,7 +151,7 @@ const { count: guestCount } = await db.from("guests").select("*", { count: "exac
 console.log("");
 if (!partyCount) {
   console.log("  No households imported yet. Next:\n");
-  console.log("    cp scripts/guests.sample.csv scripts/guests.csv");
+  console.log("    cp scripts/guests.template.csv scripts/guests.csv");
   console.log("    npm run import:guests -- --check");
   console.log("    npm run import:guests\n");
 } else {

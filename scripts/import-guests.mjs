@@ -7,6 +7,14 @@
  *   npm run import:guests                       # apply
  *   npm run import:guests -- --prune            # also remove dropped guests
  *
+ * The source can be a local CSV (the default, scripts/guests.csv) or the URL
+ * of a Google Sheet, which is read directly so there is nothing to download:
+ *
+ *   npm run import:guests -- "https://docs.google.com/spreadsheets/d/.../edit#gid=0"
+ *
+ * Reading a Sheet by URL requires it to be link-viewable, which is a real
+ * trade-off — see readSource() below.
+ *
  * Safe to re-run. Households are matched on a normalized name, so editing
  * the spreadsheet and re-importing updates in place. Tokens are minted
  * once and never regenerated — re-running will not invalidate a link you
@@ -33,7 +41,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import path from "node:path";
-import { mintToken, parseCsv, normalizeKey } from "./lib/import-utils.mjs";
+import { mintToken, parseCsv, normalizeKey, toCsvUrl } from "./lib/import-utils.mjs";
 import { hashPassword, verifyPassword } from "./lib/password-utils.mjs";
 
 // ── Args ──────────────────────────────────────────────────────────────
@@ -74,15 +82,7 @@ function getDb() {
 }
 
 // ── Read + shape the CSV ──────────────────────────────────────────────
-if (!existsSync(csvPath)) {
-  fail(
-    `No CSV at ${csvPath}.\n` +
-      `Copy scripts/guests.sample.csv to scripts/guests.csv and edit it,\n` +
-      `or pass a path: npm run import:guests -- path/to/list.csv`
-  );
-}
-
-const rows = parseCsv(readFileSync(csvPath, "utf8"));
+const rows = parseCsv(await readSource(csvPath));
 if (rows.length < 2) fail(`${csvPath} has a header but no guest rows.`);
 
 const header = rows[0].map((h) => normalizeKey(h).replace(/-/g, "_"));
@@ -417,6 +417,61 @@ console.log(`\n  This file contains every guest's private link${
 console.log(`  gitignored — don't commit it or paste it anywhere shared.\n`);
 
 // ── Helpers ───────────────────────────────────────────────────────────
+
+/**
+ * Read the guest list, from a local file or straight from a Google Sheet.
+ *
+ * The Sheet route exists so two people editing one spreadsheet don't have
+ * to remember to re-download it. It requires the Sheet to be shared as
+ * "anyone with the link can view", which is worth thinking about for two
+ * seconds before you turn it on: this spreadsheet is your whole guest list,
+ * with everyone's email and phone number in it. A link-viewable Sheet is
+ * public to anyone who ends up with the URL.
+ *
+ * That is also exactly why the template has no password column. Set
+ * passwords with `npm run password -- --all` instead, so they never live in
+ * a document that might get shared.
+ *
+ * If you'd rather not share the Sheet at all: File → Download → CSV, save it
+ * as scripts/guests.csv, and this reads the local file as before.
+ */
+async function readSource(source) {
+  if (!/^https?:\/\//i.test(source)) {
+    if (!existsSync(source)) {
+      fail(
+        `No CSV at ${source}.\n` +
+          `Copy scripts/guests.template.csv to scripts/guests.csv and edit it,\n` +
+          `pass a path: npm run import:guests -- path/to/list.csv\n` +
+          `or pass a Google Sheet URL.`
+      );
+    }
+    return readFileSync(source, "utf8");
+  }
+
+  const url = toCsvUrl(source);
+  let res;
+  try {
+    res = await fetch(url, { redirect: "follow" });
+  } catch (err) {
+    fail(`Could not reach ${url}\n${err.message}`);
+  }
+
+  const body = await res.text();
+
+  // Google answers an unshared Sheet with a sign-in PAGE and a 200, not an
+  // error, so status alone doesn't tell you anything. A guest list never
+  // starts with "<".
+  if (!res.ok || /^\s*</.test(body)) {
+    fail(
+      `That Google Sheet isn't readable without signing in.\n\n` +
+        `In the Sheet: Share → General access → "Anyone with the link" → Viewer.\n\n` +
+        `Prefer not to? File → Download → Comma-separated values, save it as\n` +
+        `scripts/guests.csv, and run: npm run import:guests`
+    );
+  }
+  return body;
+}
+
 function loadEnvLocal() {
   for (const file of [".env.local", ".env"]) {
     if (!existsSync(file)) continue;
