@@ -663,6 +663,12 @@ body::after {
   line-height: 1.75;
 }
 
+/* "Dear Eric, Rebecca and Mia," — sits above the body copy as the opening
+   line of a letter, so it keeps the body's measure rather than centring. */
+.welcome-greeting {
+  margin-bottom: 1.4rem;
+}
+
 .welcome-signoff {
   font-family: "Imperial Script", cursive;
   font-size: clamp(1.75rem, 3.5vw, 2.5rem);

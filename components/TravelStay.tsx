@@ -13,7 +13,7 @@ const GETTING_THERE = [
   {
     title: "Getting around",
     body: "Uber is limited on the island and taxis can be expensive. Rental cars are available at both the pier and the airport, and are a good option if you're looking to explore the island. ATVs are a popular choice too.",
-    note: "Please note: transportation to and from all wedding activities will be provided.",
+    note: "Please note: transportation to and from our wedding day will be provided.",
   },
 ];
 

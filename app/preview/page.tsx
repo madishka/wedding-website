@@ -7,6 +7,7 @@ import { WelcomeNote } from "@/components/WelcomeNote";
 import { TravelStay } from "@/components/TravelStay";
 import { Reveal } from "@/components/Reveal";
 import { siteConfig } from "@/lib/site-config";
+import { householdGreeting } from "@/lib/names";
 import type { Party } from "@/lib/types";
 
 /**
@@ -97,30 +98,22 @@ export default async function PreviewPage({
 
   const party = MOCK_PARTY;
   const { couple, dateLabel, placeLabel, replyBy } = siteConfig;
-  const named = party.guests.filter((g) => g.name).map((g) => g.name!);
 
   return (
     <>
       <main>
         <Hero />
 
-        {siteConfig.sections.welcomeNote && <WelcomeNote />}
+        {siteConfig.sections.welcomeNote && (
+          <WelcomeNote
+            greeting={householdGreeting(party.guests, party.displayName)}
+          />
+        )}
 
         <section className="weekend" id="weekend">
           <div className="container">
             <Reveal>
-              <p className="eyebrow center">Your invitation</p>
-              <h2 className="section-title center">{party.displayName}</h2>
-              <p className="section-intro center">
-                {named.length > 0 && <>This link is for {formatNames(named)}. </>}
-                Not you? Let us know and we&apos;ll send the right one.
-              </p>
-            </Reveal>
-
-            <Reveal>
-              <p className="eyebrow center" style={{ marginTop: "4.5rem" }}>
-                The weekend
-              </p>
+              <p className="eyebrow center">The weekend</p>
               <h2 className="section-title center">
                 A long weekend on the Aegean
               </h2>
@@ -197,10 +190,4 @@ export default async function PreviewPage({
       </footer>
     </>
   );
-}
-
-function formatNames(names: string[]): string {
-  if (names.length === 1) return names[0];
-  if (names.length === 2) return `${names[0]} and ${names[1]}`;
-  return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
 }

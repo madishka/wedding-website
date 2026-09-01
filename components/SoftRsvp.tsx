@@ -108,8 +108,7 @@ export function SoftRsvp({
             so we can get a rough sense of numbers.
           </p>
           <p className="rsvp-note">
-            Meals, allergies, little ones, hotels, and RSVPs for each day&apos;s
-            events all come later — through this same link.
+            Additional details to follow.
           </p>
         </div>
 

@@ -99,16 +99,20 @@ export const siteConfig = {
   replyBy: { month: "October", day: "1", year: "2026" },
 
   /**
-   * The welcome note. ⚠️ Placeholder — swap in your and Philip's real
-   * words. Kept here rather than in the component so changing it is a
-   * one-file edit.
+   * The welcome note.
+   *
+   * The greeting line is built from the household's actual guests at render
+   * time — see lib/names.ts — so this is only the body around it.
    */
   welcomeNote: {
     eyebrow: "A note from us",
     title: "We're so glad you're here",
+    /** Precedes the names: "Dear Eric, Rebecca and Mia," */
+    greeting: "Dear",
     paragraphs: [
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
-      "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt.",
+      "We're getting married in Santorini on 24 July 2027, and there is no one we'd rather have there than you.",
+      "This is just an early note so you can put the date in your diary. Nothing to book and nothing to decide yet — we only want a rough sense of who's hoping to come.",
+      "Let us know below, and we'll follow up this autumn with the full details and a proper invitation.",
     ],
   },
 };
