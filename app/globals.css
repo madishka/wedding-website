@@ -747,6 +747,27 @@ body::after {
   align-items: start;
 }
 
+/* The emblem, turning as the section scrolls in (EmblemRsvp.tsx). Sits
+   above "Kindly reply by" in the left column, pushing the title down.
+   Smaller than the hero's, and starts invisible — the component fades
+   it in as the turn begins. */
+.rsvp-emblem {
+  width: min(48vw, 200px);
+  aspect-ratio: 1 / 1;
+  margin: -1.5rem 0 1.6rem -1.25rem; /* the model sits in a square with
+                                        air around it; pull that air back
+                                        so the mark itself lines up with
+                                        the title's left edge and top */
+  opacity: 0;
+  will-change: opacity;
+}
+
+.rsvp-emblem canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
 .rsvp-title {
   font-family: var(--font-display), serif;
   font-weight: 400;
@@ -1091,6 +1112,10 @@ body::after {
 
   .rsvp-copy {
     text-align: center;
+  }
+
+  .rsvp-emblem {
+    margin-inline: auto;
   }
 
   .rsvp-date {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { EmblemRsvp } from "./EmblemRsvp";
 
 type Status = "idle" | "submitting" | "done" | "error";
 
@@ -21,6 +22,7 @@ export function SoftRsvp({
   initialEmail,
   initialNote,
   replyBy,
+  emblem = false,
 }: {
   /**
    * The people, by first name — "Carly and Brandon" — not the household's
@@ -34,6 +36,12 @@ export function SoftRsvp({
   initialEmail: string | null;
   initialNote: string | null;
   replyBy: { month: string; day: string; year: string };
+  /**
+   * Show the turning emblem above "Kindly reply by" (EmblemRsvp.tsx).
+   * On for the dev previews while it's being tried out; the token page
+   * can switch it on with the same prop.
+   */
+  emblem?: boolean;
 }) {
   const [response, setResponse] = useState<"yes" | "no" | null>(initialResponse);
   const [email, setEmail] = useState(initialEmail ?? "");
@@ -98,6 +106,7 @@ export function SoftRsvp({
       <div className="container rsvp-grid">
         {/* Left column: the editorial block, as the original design had it. */}
         <div className="rsvp-copy">
+          {emblem && <EmblemRsvp />}
           <h2 className="rsvp-title">
             Kindly
             <br />

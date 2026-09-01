@@ -149,6 +149,7 @@ export function PreviewSite({ heroBackdrop }: { heroBackdrop: HeroBackdrop }) {
           initialEmail={party.contactEmail}
           initialNote={party.softNote}
           replyBy={replyBy}
+          emblem
         />
       </main>
 
