@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 // Self-hosted fonts (no request to Google at build or runtime)
 import "@fontsource-variable/cormorant-garamond"; // display
-import "@fontsource/imperial-script"; // script accents ("by", "you")
 import "@fontsource-variable/jost"; // body
 import "./globals.css";
 

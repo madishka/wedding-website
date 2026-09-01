@@ -69,7 +69,7 @@ export function SoftRsvp({
         <div className="container">
           <div className="rsvp-success">
             <h3 className="rsvp-title">
-              Thank <span className="script">you</span>
+              Thank you
             </h3>
             <p>
               {response === "yes"
@@ -94,7 +94,7 @@ export function SoftRsvp({
           <h2 className="rsvp-title">
             Kindly
             <br />
-            reply <span className="script">by</span>
+            reply by
           </h2>
           <p className="rsvp-date">
             <span>{replyBy.month}</span>

@@ -1,7 +1,7 @@
 /* ————————————————————————————————————————————————
    Madelaine & Philip · Save the Date
    Moody editorial: dark aerial sea, warm greige, deep ink.
-   Type: Cormorant Garamond (display) + Imperial Script (accents) + Jost (body).
+   Type: Cormorant Garamond (display) + Jost (body).
    ———————————————————————————————————————————————— */
 
 :root {
@@ -21,9 +21,6 @@
      very thin strokes and stylised letterforms read as fussy at display
      size. Softer, warmer, and far more legible small and on mobile. */
   --font-display: "Cormorant Garamond Variable";
-  /* Kept for the RSVP accents only ("reply by", "Thank you") — deliberately
-     no longer used in the names lockup. */
-  --font-script: "Imperial Script";
   --font-body: "Jost Variable";
 
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -78,13 +75,6 @@ body::after {
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
-}
-
-.script {
-  font-family: var(--font-script), cursive;
-  font-weight: 400;
-  text-transform: none;
-  letter-spacing: 0;
 }
 
 /* ——— shared type ——— */
@@ -714,11 +704,6 @@ body::after {
   text-transform: uppercase;
 }
 
-.rsvp-title .script {
-  font-size: 0.62em;
-  margin-left: 0.12em;
-}
-
 .rsvp-date {
   display: flex;
   align-items: center;
@@ -872,11 +857,6 @@ body::after {
   font-size: 2.6rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-}
-
-.rsvp-success h3 .script {
-  font-size: 0.72em;
-  margin-left: 0.15em;
 }
 
 .rsvp-success p {
