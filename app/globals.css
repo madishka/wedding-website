@@ -500,6 +500,18 @@ body::after {
 }
 
 /* the wedding day, given center stage */
+/* "To be confirmed" on an outline card. Quiet on purpose: it is a status,
+   not a heading, and it sits under copy that already says details follow. */
+.event-tbd {
+  margin-top: 1rem;
+  font-size: 0.68rem;
+  font-weight: 400;
+  letter-spacing: 0.24em;
+  text-indent: 0.24em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
 .event-card.featured {
   background: var(--ink);
   border-color: var(--ink);

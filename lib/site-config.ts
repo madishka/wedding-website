@@ -26,6 +26,52 @@ export const siteConfig = {
   whatsappGroupUrl: "",
 
   /**
+   * How much of the weekend to show behind a guest's link.
+   *
+   * "outline"   → the shape of the weekend only: the wedding day, with the
+   *               days either side marked as still being planned. Nobody
+   *               sees which specific gatherings they are or aren't in.
+   * "per-event" → the real itinerary, filtered through `party_events` to
+   *               the events this household is actually invited to.
+   *
+   * The database is the same either way. `party_events` keeps recording who
+   * is invited to what while this says "outline", so flipping to
+   * "per-event" with the real invitations needs no migration and no
+   * re-import — just this line.
+   */
+  weekendDetail: "outline" as "outline" | "per-event",
+
+  /**
+   * The outline above, in words. Edited here rather than in the component
+   * so changing the copy is a one-file edit — and so the day either side
+   * can become real without touching any layout.
+   *
+   * Deliberately unspecific. "Something the evening before" tells a guest
+   * to book two nights; naming the boat party would tell everyone it
+   * exists, including the households not invited to it.
+   */
+  weekendOutline: [
+    {
+      dateLabel: "July 23",
+      name: "The evening before",
+      body: "We're planning something to open the weekend. Details to come with the full invitation.",
+      tbd: true,
+    },
+    {
+      dateLabel: "July 24",
+      name: "The wedding",
+      body: "A clifftop ceremony overlooking the caldera, followed by dinner and dancing.",
+      tbd: false,
+    },
+    {
+      dateLabel: "July 25",
+      name: "The morning after",
+      body: "A slow send-off before everyone scatters. Details to come.",
+      tbd: true,
+    },
+  ],
+
+  /**
    * Which sections appear behind a guest's link.
    *
    * The site grows as logistics firm up — flip a flag, no code changes.

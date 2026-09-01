@@ -77,7 +77,28 @@ export default async function PartyPage({
               </h2>
             </Reveal>
 
-            {party.events.length > 0 ? (
+            {/* Two ways to show the weekend, chosen by siteConfig.
+                weekendDetail. The outline is what every household sees for
+                the save-the-date: the shape of the weekend, with the days
+                either side still open. The per-event branch below is the
+                real itinerary, and it is already filtered by party_events —
+                it is waiting on the invitations, not on code. */}
+            {siteConfig.weekendDetail === "outline" ? (
+              <div className="event-grid">
+                {siteConfig.weekendOutline.map((day, i) => (
+                  <Reveal key={day.name} delay={i * 100}>
+                    <article
+                      className={`event-card ${day.tbd ? "" : "featured"}`}
+                    >
+                      <p className="event-date">{day.dateLabel}</p>
+                      <h3>{day.name}</h3>
+                      <p className="event-body">{day.body}</p>
+                      {day.tbd && <p className="event-tbd">To be confirmed</p>}
+                    </article>
+                  </Reveal>
+                ))}
+              </div>
+            ) : party.events.length > 0 ? (
               <div className="event-grid">
                 {party.events.map((event, i) => (
                   <Reveal key={event.id} delay={i * 100}>
