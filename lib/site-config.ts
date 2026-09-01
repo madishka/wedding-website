@@ -93,7 +93,7 @@ export const siteConfig = {
   },
 
   couple: { partnerA: "Madelaine", partnerB: "Philip" },
-  dateLabel: "07.24.2027",
+  dateLabel: "July 24, 2027",
   placeLabel: "Santorini, Greece",
   /** RSVP deadline shown in the "Kindly reply by" block. */
   replyBy: { month: "October", day: "1", year: "2026" },
