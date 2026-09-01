@@ -920,6 +920,118 @@ body::after {
 
 /* ——— responsive ——— */
 
+/* ————————————————————————————————————————————————
+   The password gate
+   Stands in for the whole invitation until a household types their
+   password. Says nothing: no date, no island, not even whose link it is.
+   ———————————————————————————————————————————————— */
+
+.gate {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 2rem 1.5rem;
+  color: var(--white);
+}
+
+.gate .hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.gate-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 26rem;
+  text-align: center;
+}
+
+/* Smaller than the real hero — this is a doorway, not the arrival. */
+.gate-names {
+  font-size: clamp(2.6rem, 8vw, 4.4rem);
+}
+
+.gate-form {
+  width: 100%;
+  margin-top: 2.75rem;
+}
+
+.gate-label {
+  display: block;
+  margin-bottom: 1rem;
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.32em;
+  text-indent: 0.32em; /* balance the trailing tracking */
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* Not .field: that palette is ink-on-paper, and this sits on the dark
+   gradient. Same proportions, inverted. */
+.gate-form input {
+  width: 100%;
+  font: inherit;
+  font-weight: 300;
+  text-align: center;
+  letter-spacing: 0.18em;
+  color: var(--white);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 3px;
+  padding: 0.8rem 0.9rem;
+  transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+}
+
+.gate-form input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.gate-form input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.13);
+  border-color: rgba(255, 255, 255, 0.75);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.14);
+}
+
+.gate-form input[aria-invalid="true"] {
+  border-color: rgba(233, 145, 135, 0.85);
+}
+
+/* The dark equivalent of .submit — light on dark, since the ink button
+   would disappear into this background. */
+.gate-submit {
+  margin-top: 1rem;
+  background: var(--white);
+  color: var(--ink);
+}
+
+.gate-submit:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.gate-error {
+  margin-top: 0.85rem;
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: #f0b3ab;
+}
+
+.gate-hint {
+  margin-top: 1.4rem;
+  font-size: 0.74rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.62);
+}
+
 @media (max-width: 900px) {
   .rsvp-grid {
     grid-template-columns: 1fr;

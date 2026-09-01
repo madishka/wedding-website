@@ -134,6 +134,16 @@ if (softErr) {
   bad("parties.soft_response missing", "Re-run supabase/schema.sql to pick up the newer columns.");
 } else ok("soft-reply columns present");
 
+// So are the password columns.
+const { error: pwErr } = await db.from("parties").select("password_hash").limit(1);
+if (pwErr) {
+  bad(
+    "parties.password_hash missing",
+    "Re-run supabase/schema.sql to pick up the password columns.\n" +
+      "Until then every link opens without a password."
+  );
+} else ok("password columns present");
+
 // ── 4. Data so far ────────────────────────────────────────────────────
 const { count: partyCount } = await db.from("parties").select("*", { count: "exact", head: true });
 const { count: guestCount } = await db.from("guests").select("*", { count: "exact", head: true });
@@ -150,7 +160,21 @@ if (!partyCount) {
     .from("parties")
     .select("*", { count: "exact", head: true })
     .not("soft_response", "is", null);
-  console.log(`  \x1b[32m✓\x1b[0m ${replied ?? 0} have replied\n`);
+  console.log(`  \x1b[32m✓\x1b[0m ${replied ?? 0} have replied`);
+
+  if (!pwErr) {
+    const { count: locked } = await db
+      .from("parties")
+      .select("*", { count: "exact", head: true })
+      .not("password_hash", "is", null);
+    // Not a failure. No password is a perfectly valid configuration —
+    // the link token is the real credential either way.
+    console.log(
+      `  \x1b[32m✓\x1b[0m ${locked ?? 0} of ${partyCount} have a password` +
+        (locked ? "" : "   (npm run password -- --all)")
+    );
+  }
+  console.log("");
 }
 
 if (failed) process.exit(1);

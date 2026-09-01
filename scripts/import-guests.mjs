@@ -14,12 +14,27 @@
  *
  * Guests that disappear from the CSV are reported but NOT deleted unless
  * you pass --prune, because deleting a guest also deletes their RSVPs.
+ *
+ * PASSWORDS. An optional `password` column sets each household's password.
+ * It is hashed on the way in — the database never sees the plaintext, only
+ * your spreadsheet does. The column is opt-in:
+ *
+ *   - no `password` column at all → passwords are left exactly as they are
+ *   - a value                     → that becomes the household's password
+ *   - blank, column present       → that household's password is REMOVED
+ *                                   and their link opens straight through
+ *
+ * Re-typing the SAME password is a no-op: we verify before rewriting, so a
+ * routine re-import does not bump password_set_at and does not log every
+ * already-unlocked guest back out. Only a genuine change does that — which
+ * is exactly what you want when resetting a link that leaked.
  */
 
 import { createClient } from "@supabase/supabase-js";
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import path from "node:path";
 import { mintToken, parseCsv, normalizeKey } from "./lib/import-utils.mjs";
+import { hashPassword, verifyPassword } from "./lib/password-utils.mjs";
 
 // ── Args ──────────────────────────────────────────────────────────────
 const args = process.argv.slice(2);
@@ -76,6 +91,10 @@ for (const col of need) {
   if (!header.includes(col)) fail(`${csvPath} is missing a "${col}" column.`);
 }
 
+// Opt-in. Without the column we never touch a stored password, so adding
+// passwords later — or never — costs nothing.
+const HAS_PASSWORD_COL = header.includes("password");
+
 const records = rows.slice(1).map((cells) => {
   const rec = {};
   header.forEach((h, i) => (rec[h] = (cells[i] ?? "").trim()));
@@ -103,6 +122,8 @@ records.forEach((rec, idx) => {
       contact_phone: null,
       invited_via: null,
       notes: null,
+      // Plaintext, only ever held in memory long enough to hash.
+      password: null,
       eventSlugs: [],
       guests: [],
     });
@@ -113,6 +134,7 @@ records.forEach((rec, idx) => {
   party.contact_phone ||= rec.contact_phone || null;
   party.invited_via ||= rec.invited_via || null;
   party.notes ||= rec.notes || null;
+  if (HAS_PASSWORD_COL) party.password ||= rec.password || null;
 
   if (rec.events) {
     for (const slug of rec.events.split(/[,;]/)) {
@@ -157,6 +179,9 @@ if (CHECK) {
     const contact = p.contact_email || p.contact_phone || "no contact!";
     console.log(`  ${p.display_name}  —  ${contact}`);
     console.log(`    events: ${p.eventSlugs.join(", ") || "none"}`);
+    if (HAS_PASSWORD_COL) {
+      console.log(`    password: ${p.password ?? "(blank — would be removed)"}`);
+    }
     for (const g of p.guests) {
       console.log(`    · ${g.name ?? "(unnamed slot)"} — ${g.guest_type}`);
     }
@@ -166,6 +191,9 @@ if (CHECK) {
     console.error(`  ✗ ${problems.length} problem(s):\n`);
     problems.forEach((x) => console.error("     " + x));
     process.exit(1);
+  }
+  if (!HAS_PASSWORD_COL) {
+    console.log("  · no \"password\" column — existing passwords left alone\n");
   }
   console.log("  ✓ no problems found\n");
   process.exit(0);
@@ -199,7 +227,7 @@ if (unknownSlugs.size) {
 // ── Reconcile with what's already there ───────────────────────────────
 const { data: existingParties, error: exErr } = await getDb()
   .from("parties")
-  .select("id, import_key, token, display_name");
+  .select("id, import_key, token, display_name, password_hash");
 if (exErr) fail(`Could not read parties: ${exErr.message}`);
 
 const existingByKey = new Map(existingParties.map((p) => [p.import_key, p]));
@@ -208,8 +236,24 @@ const toCreate = [];
 const toUpdate = [];
 for (const p of parties.values()) {
   const found = existingByKey.get(p.import_key);
+  p.passwordAction = decidePassword(p.password, found?.password_hash ?? null);
   if (found) toUpdate.push({ ...p, id: found.id, token: found.token });
   else toCreate.push({ ...p, token: mintToken() });
+}
+
+/**
+ * What should happen to this household's password?
+ *
+ * The important case is "same": re-typing an unchanged password must NOT
+ * rewrite the hash, because a new hash means a new password_set_at, and
+ * that logs every already-unlocked device out. A routine re-import to add
+ * one guest should not make forty households re-type their password.
+ */
+function decidePassword(plaintext, currentHash) {
+  if (!HAS_PASSWORD_COL) return "untouched";
+  if (!plaintext) return currentHash ? "cleared" : "none";
+  if (currentHash && verifyPassword(plaintext, currentHash)) return "same";
+  return currentHash ? "changed" : "set";
 }
 
 const csvKeys = new Set(parties.keys());
@@ -219,6 +263,28 @@ console.log(`\n  ${csvPath}`);
 console.log(`  ${parties.size} households, ${records.length} guests\n`);
 console.log(`  new households    ${toCreate.length}`);
 console.log(`  updated           ${toUpdate.length}`);
+
+if (HAS_PASSWORD_COL) {
+  const all = [...toCreate, ...toUpdate];
+  const tally = (a) => all.filter((p) => p.passwordAction === a);
+  const set = tally("set");
+  const changed = tally("changed");
+  const cleared = tally("cleared");
+  console.log(`  passwords set     ${set.length}`);
+  if (changed.length) {
+    console.log(
+      `  passwords CHANGED ${changed.length}  (logs their unlocked devices out)`
+    );
+    changed.forEach((p) => console.log(`      · ${p.display_name}`));
+  }
+  if (cleared.length) {
+    console.log(
+      `  passwords REMOVED ${cleared.length}  (blank in the CSV — link opens straight through)`
+    );
+    cleared.forEach((p) => console.log(`      · ${p.display_name}`));
+  }
+  console.log(`  unchanged         ${tally("same").length}`);
+}
 if (orphanParties.length) {
   console.log(`  in DB but not CSV ${orphanParties.length}  (left alone)`);
   orphanParties.forEach((p) => console.log(`      · ${p.display_name}`));
@@ -244,6 +310,17 @@ for (const p of [...toCreate, ...toUpdate]) {
     invited_via: p.invited_via,
     notes: p.notes,
   };
+
+  // Only ever touched when it actually changes. Leaving the keys off the
+  // payload entirely matters: an upsert updates only the columns it is
+  // given, so an untouched password survives every re-import.
+  if (p.passwordAction === "set" || p.passwordAction === "changed") {
+    payload.password_hash = hashPassword(p.password);
+    payload.password_set_at = new Date().toISOString();
+  } else if (p.passwordAction === "cleared") {
+    payload.password_hash = null;
+    payload.password_set_at = null;
+  }
 
   const { data: saved, error } = await getDb()
     .from("parties")
@@ -306,7 +383,7 @@ mkdirSync(outDir, { recursive: true });
 const outPath = path.join(outDir, "links.csv");
 
 const csvOut = [
-  ["household", "contact_email", "contact_phone", "invited_via", "guests", "link"],
+  ["household", "contact_email", "contact_phone", "invited_via", "guests", "link", "password"],
   ...[...toCreate, ...toUpdate].map((p) => [
     p.display_name,
     p.contact_email ?? "",
@@ -314,6 +391,14 @@ const csvOut = [
     p.invited_via ?? "",
     String(p.guests.length),
     `${SITE_URL.replace(/\/$/, "")}/i/${p.token}`,
+    // The link and the password, side by side, ready to paste into one
+    // message. Blank means the link opens without one. "(already set)"
+    // means there is a password but this CSV didn't supply it, so we only
+    // have the hash and genuinely cannot tell you what it is — reset it
+    // with `npm run password` if it's been lost.
+    p.password ?? (p.passwordAction === "untouched" && existingByKey.get(p.import_key)?.password_hash
+      ? "(already set)"
+      : ""),
   ]),
 ]
   .map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(","))
@@ -326,7 +411,9 @@ if (guestsOrphaned && !PRUNE) {
   console.log(`  ! ${guestsOrphaned} guest(s) kept but missing from the CSV`);
 }
 console.log(`  ✓ links → ${outPath}`);
-console.log(`\n  This file contains every guest's private link. It is`);
+console.log(`\n  This file contains every guest's private link${
+  HAS_PASSWORD_COL ? " and password" : ""
+}. It is`);
 console.log(`  gitignored — don't commit it or paste it anywhere shared.\n`);
 
 // ── Helpers ───────────────────────────────────────────────────────────

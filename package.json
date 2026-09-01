@@ -10,7 +10,8 @@
     "check": "bash scripts/with-node22.sh node scripts/check-setup.mjs",
     "import:guests": "bash scripts/with-node22.sh node scripts/import-guests.mjs",
     "test": "bash scripts/with-node22.sh node --test scripts/lib/*.test.mjs",
-    "seed:events": "bash scripts/with-node22.sh node scripts/seed-events.mjs"
+    "seed:events": "bash scripts/with-node22.sh node scripts/seed-events.mjs",
+    "password": "bash scripts/with-node22.sh node scripts/set-password.mjs"
   },
   "dependencies": {
     "@fontsource-variable/jost": "^5.3.0",

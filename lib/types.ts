@@ -43,6 +43,23 @@ export type Party = {
   /** Wave-one save-the-date reply. Null = not answered yet. */
   softResponse: "yes" | "no" | null;
   softNote: string | null;
+
+  /**
+   * Whether this household's link asks for a password before showing
+   * anything. False for every household that has not been given one.
+   *
+   * Note what is NOT here: the hash. It never travels on this object, so it
+   * cannot be handed to a client component by accident. Only the unlock
+   * route reads it, via getPartyAuthByToken().
+   */
+  hasPassword: boolean;
+
+  /**
+   * When the password last CHANGED. Not a secret — it is signed into the
+   * unlock cookie so that a password reset invalidates every cookie minted
+   * under the old one. See lib/unlock.ts.
+   */
+  passwordSetAt: string | null;
   guests: Guest[];
   /** ONLY the events this household is invited to. Filtered in the query. */
   events: WeddingEvent[];

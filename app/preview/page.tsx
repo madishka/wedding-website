@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Hero } from "@/components/Hero";
+import { PasswordGate } from "@/components/PasswordGate";
 import { SoftRsvp } from "@/components/SoftRsvp";
 import { WelcomeNote } from "@/components/WelcomeNote";
 import { TravelStay } from "@/components/TravelStay";
@@ -30,6 +31,8 @@ const MOCK_PARTY: Party = {
   contactPhone: null,
   softResponse: null,
   softNote: null,
+  hasPassword: false,
+  passwordSetAt: null,
   guests: [
     { id: "g1", name: "Jordan Rivera", guestType: "adult", sortOrder: 0 },
     { id: "g2", name: "Casey Rivera", guestType: "adult", sortOrder: 1 },
@@ -79,8 +82,18 @@ const MOCK_PARTY: Party = {
   rsvps: [],
 };
 
-export default function PreviewPage() {
+export default async function PreviewPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ gate?: string }>;
+}) {
   if (process.env.NODE_ENV === "production") notFound();
+
+  // /preview?gate — the password screen on its own, so it can be designed
+  // without minting a real link and setting a real password. The form will
+  // not actually unlock anything here: there is no link cookie to say which
+  // household it would be unlocking.
+  if ("gate" in (await searchParams)) return <PasswordGate />;
 
   const party = MOCK_PARTY;
   const { couple, dateLabel, placeLabel, replyBy } = siteConfig;

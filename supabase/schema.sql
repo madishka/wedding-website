@@ -49,6 +49,28 @@ create table if not exists parties (
 
 create index if not exists parties_token_idx on parties (token);
 
+-- ── The password (optional, per household) ────────────────────────────
+--
+-- Null = no password: the link opens straight to the invitation. This is
+-- the default, and every household created before this column existed
+-- keeps working untouched.
+--
+-- The password is a SECOND curtain, not the lock. The token is already
+-- 109 unguessable bits; this only helps in the narrow case where the bare
+-- URL leaks on its own — a screenshot of the address bar, a link pasted
+-- into a group chat without the accompanying message, a shared browser's
+-- history. Treat it accordingly: it is fine for it to be "chen2027".
+--
+-- Never stored in the clear. scrypt, salted, written by the CSV importer
+-- or `npm run password` — see scripts/lib/password-utils.mjs.
+alter table parties add column if not exists password_hash   text;
+
+-- Bumped every time the password actually CHANGES. It is folded into the
+-- signature on the unlock cookie, which is what makes a password change
+-- log every already-unlocked device back out. Without it, resetting a
+-- leaked household's password would not actually evict anyone.
+alter table parties add column if not exists password_set_at timestamptz;
+
 -- Additive, for a database created before the soft-reply columns existed.
 -- No-ops on a fresh schema.
 alter table parties add column if not exists soft_response     text;

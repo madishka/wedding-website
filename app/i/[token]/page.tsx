@@ -1,11 +1,13 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Hero } from "@/components/Hero";
+import { PasswordGate } from "@/components/PasswordGate";
 import { SoftRsvp } from "@/components/SoftRsvp";
 import { WelcomeNote } from "@/components/WelcomeNote";
 import { TravelStay } from "@/components/TravelStay";
 import { Reveal } from "@/components/Reveal";
 import { getPartyByToken, markOpened } from "@/lib/party";
+import { hasUnlockCookie } from "@/lib/unlock";
 import { siteConfig } from "@/lib/site-config";
 
 export const dynamic = "force-dynamic";
@@ -28,6 +30,18 @@ export default async function PartyPage({
   const party = await getPartyByToken(token);
   if (!party) notFound();
 
+  // The password curtain. Households without one fall straight through, so
+  // every link minted before passwords existed keeps working.
+  //
+  // This returns BEFORE anything below is rendered — the date, the island
+  // and the itinerary are never sent to a browser that hasn't unlocked, not
+  // hidden in it with CSS.
+  if (party.hasPassword && !(await hasUnlockCookie(party.id, party.passwordSetAt))) {
+    return <PasswordGate />;
+  }
+
+  // Stamped after the gate on purpose: "first opened" should mean somebody
+  // actually got in, not that a link was loaded.
   await markOpened(party.id);
 
   const { couple, dateLabel, placeLabel, replyBy } = siteConfig;

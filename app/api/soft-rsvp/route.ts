@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getPartyByToken, saveSoftResponse } from "@/lib/party";
+import { hasUnlockCookie } from "@/lib/unlock";
 
 /**
  * The soft save-the-date reply.
@@ -17,6 +18,21 @@ export async function POST(req: Request) {
   if (!party) {
     return NextResponse.json(
       { error: "We couldn't tell which invitation this is. Please reopen your personal link." },
+      { status: 401 }
+    );
+  }
+
+  // The password gate again, because the page's gate is not enough on its
+  // own: middleware waves through ANY request carrying a shape-valid link
+  // cookie, so without this check someone holding a leaked link could POST
+  // straight here and answer for a household without ever passing the
+  // password screen.
+  if (
+    party.hasPassword &&
+    !(await hasUnlockCookie(party.id, party.passwordSetAt))
+  ) {
+    return NextResponse.json(
+      { error: "Please enter your password first." },
       { status: 401 }
     );
   }
