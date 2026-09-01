@@ -110,9 +110,9 @@ export const siteConfig = {
     /** Precedes the names: "Dear Eric, Rebecca and Mia," */
     greeting: "Dear",
     paragraphs: [
-      "We're getting married in Santorini on 24 July 2027, and there is no one we'd rather have there than you.",
-      "This is just an early note so you can put the date in your diary. Nothing to book and nothing to decide yet — we only want a rough sense of who's hoping to come.",
-      "Let us know below, and we'll follow up this autumn with the full details and a proper invitation.",
+      "We're getting married in Santorini on 24 July 2027, and we would love to celebrate with you.",
+      "You'll find some early details below. Nothing is final yet and there's nothing to book — the full information comes this autumn.",
+      "For now, please reply below so we can get a sense of numbers.",
     ],
   },
 };

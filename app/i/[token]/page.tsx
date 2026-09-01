@@ -157,7 +157,6 @@ export default async function PartyPage({
               Join the WhatsApp group
             </a>
           )}
-          <p className="footer-note">Full details to follow</p>
         </div>
       </footer>
     </>

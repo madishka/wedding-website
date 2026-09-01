@@ -2,15 +2,15 @@ import { Reveal } from "./Reveal";
 import { siteConfig } from "@/lib/site-config";
 
 /**
- * The welcome note — the couple's own words, addressed to this household by
- * name, plus the one piece of housekeeping that matters this early.
+ * The welcome note — addressed to this household by name, plus the one piece
+ * of housekeeping that matters this early.
  *
  * The greeting is the only personalised thing on the page now that the
  * weekend is shown as an outline, so it is doing real work: it is how a
  * guest can tell at a glance that this link is theirs and not a forward.
  */
 export function WelcomeNote({ greeting }: { greeting: string }) {
-  const { welcomeNote, couple } = siteConfig;
+  const { welcomeNote } = siteConfig;
 
   return (
     <section className="welcome" id="welcome">
@@ -28,9 +28,6 @@ export function WelcomeNote({ greeting }: { greeting: string }) {
             {welcomeNote.paragraphs.map((text, i) => (
               <p key={i}>{text}</p>
             ))}
-            <p className="welcome-signoff">
-              {couple.partnerA} &amp; {couple.partnerB}
-            </p>
           </div>
         </Reveal>
 

@@ -185,7 +185,6 @@ export default async function PreviewPage({
               Join the WhatsApp group
             </a>
           )}
-          <p className="footer-note">Full details to follow</p>
         </div>
       </footer>
     </>

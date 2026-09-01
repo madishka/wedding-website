@@ -680,16 +680,6 @@ body::after {
   margin-bottom: 1.4rem;
 }
 
-.welcome-signoff {
-  font-family: "Imperial Script", cursive;
-  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
-  line-height: 1.2;
-  /* The script face has very tight sidebearings, so the default word
-     space collapses and it reads "Madelaine&Philip". */
-  word-spacing: 0.25em;
-  margin-top: clamp(1.5rem, 3vw, 2.25rem) !important;
-}
-
 .welcome-aside {
   max-width: 52ch;
   margin: clamp(2.5rem, 5vw, 4rem) auto 0;
