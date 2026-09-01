@@ -475,6 +475,19 @@ body::after {
 .footer {
   position: relative;
   z-index: 1;
+  /* Each section gets its own compositing layer, explicitly.
+
+     The hero underneath is sticky and has GPU-composited children
+     (.hero-bg / .hero-inner carry will-change, and the video mode adds a
+     <video>). Without this, Safari decides whether these sections need
+     their own layers by overlap-testing them against the sticky hero's
+     *current* position — and when the hero un-pins at the bottom of
+     <main> and re-pins on the way back up, that overlap map goes stale.
+     The sections then intermittently lose their layer and the hero's
+     layers paint straight through them: the backdrop "reappears" while
+     scrolling down. Forcing the layer removes the guesswork; z-index
+     alone was never the problem. */
+  transform: translateZ(0);
 }
 
 .weekend {
