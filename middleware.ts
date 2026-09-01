@@ -49,11 +49,15 @@ export function middleware(req: NextRequest) {
     return noindex(NextResponse.next());
   }
 
-  // Dev-only preview of the full site with mock data, no Supabase or
-  // real token needed — see app/preview/page.tsx. That page 404s itself
-  // outside development; this just keeps the gate from redirecting it
-  // away before it gets the chance to.
-  if (pathname === "/preview" && process.env.NODE_ENV !== "production") {
+  // Dev-only previews of the full site with mock data, no Supabase or
+  // real token needed — /preview, /preview-image, /preview-video (see
+  // components/PreviewSite.tsx). Those pages 404 themselves outside
+  // development; this just keeps the gate from redirecting them away
+  // before they get the chance to.
+  if (
+    (pathname === "/preview" || pathname.startsWith("/preview-")) &&
+    process.env.NODE_ENV !== "production"
+  ) {
     return noindex(NextResponse.next());
   }
 
@@ -81,6 +85,8 @@ function noindex(res: NextResponse): NextResponse {
 export const config = {
   matcher: [
     // Everything except Next internals and static files in /public.
-    "/((?!_next/static|_next/image|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf|glb)$).*)",
+    // Media has to be listed here too — a <video> whose file gets
+    // redirected to "/" by the gate fails silently with no usable source.
+    "/((?!_next/static|_next/image|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|avif|mp4|webm|mov|woff|woff2|ttf|glb)$).*)",
   ],
 };

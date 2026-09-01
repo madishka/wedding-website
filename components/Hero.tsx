@@ -1,6 +1,9 @@
 import { siteConfig } from "@/lib/site-config";
 import { EmblemHero } from "./EmblemHero";
 import { HeroMotion } from "./HeroMotion";
+import { HeroVideo } from "./HeroVideo";
+
+export type HeroBackdrop = "image" | "video";
 
 /** Built from the visible sections, so the nav never links to a section
  *  that is switched off in lib/site-config.ts. */
@@ -23,21 +26,41 @@ function buildNav() {
  * The PUBLIC root page shows names only — no date, no place, no nav.
  * Anyone can land on `/`, and nothing there should tell them where or
  * when the wedding is. The full version renders only behind a token.
+ *
+ * `backdrop` picks what sits behind the full version:
+ *   "image" — public/hero-sea.jpg with a slow scroll-linked zoom
+ *   "video" — the caldera drone clip, scrubbed by scroll position
+ *             (HeroVideo.tsx). This mode also renders a spacer after
+ *             the pinned hero so the clip has scroll room to play out
+ *             before the content sections curtain over it.
+ * The public root ignores it — it never shows a photograph or the clip.
  */
-export function Hero({ showDetails = true }: { showDetails?: boolean }) {
+export function Hero({
+  showDetails = true,
+  backdrop = "image",
+}: {
+  showDetails?: boolean;
+  backdrop?: HeroBackdrop;
+}) {
   const { couple, dateLabel, placeLabel } = siteConfig;
+  const useVideo = showDetails && backdrop === "video";
   return (
+    <>
     <section className="hero" id="top">
       <HeroMotion fadeContent={showDetails} />
-      {/*
-        Backdrop: public/hero-sea.jpg (procedurally generated abstract
-        aerial sea). Drop in any dark moody image at the same path to
-        replace it — the overlay gradient keeps the type legible.
-      */}
-      <div
-        className={`hero-bg ${showDetails ? "" : "hero-bg-plain"}`}
-        aria-hidden="true"
-      />
+      {useVideo ? (
+        <HeroVideo />
+      ) : (
+        /*
+          Backdrop: public/hero-sea.jpg (procedurally generated abstract
+          aerial sea). Drop in any dark moody image at the same path to
+          replace it — the overlay gradient keeps the type legible.
+        */
+        <div
+          className={`hero-bg ${showDetails ? "" : "hero-bg-plain"}`}
+          aria-hidden="true"
+        />
+      )}
 
       {showDetails && (
         <header className="nav">
@@ -132,5 +155,10 @@ export function Hero({ showDetails = true }: { showDetails?: boolean }) {
         </div>
       )}
     </section>
+    {/* Scroll runway for the video scrub (see HeroVideo.tsx). Empty on
+        purpose: the hero above is sticky, so this just holds the page
+        open while the clip plays out. Height lives in globals.css. */}
+    {useVideo && <div className="hero-scroll-space" aria-hidden="true" />}
+    </>
   );
 }

@@ -356,6 +356,34 @@ deepens as details firm up. No second send, no "ignore the old link".
 5. **PWA icons.** `public/icon.svg` works, but iOS wants PNG
    apple-touch icons (180×180, plus 192/512 in the manifest).
 
+## Previewing without a database
+
+Three dev-only routes render the full token page with mock data (no
+Supabase, no link needed). They 404 in production.
+
+| Route | Hero backdrop |
+| --- | --- |
+| `/preview`, `/preview-image` | `public/hero-sea.jpg`, slow scroll-linked zoom |
+| `/preview-video` | The caldera drone clip, **scrubbed by scroll** — scrolling down pushes the drone forward, scrolling up pulls it back |
+
+The video is `components/HeroVideo.tsx`; the `backdrop` prop on `Hero`
+switches between the two, so the real `/i/[token]` page can adopt either
+with a one-word change.
+
+### Re-encoding the hero clip
+
+The clip in `public/` is not the original — it's re-encoded specifically
+for scrubbing (60 fps via motion interpolation, 6-frame GOPs, no audio,
+HEVC + H.264 variants, poster frame). To swap the footage:
+
+```bash
+bash scripts/encode-hero-video.sh path/to/new-clip.mp4
+```
+
+Needs `ffmpeg`; the script's header explains every encode choice and how
+to run it with `ffmpeg-static` if you don't have ffmpeg installed. If you
+change the output frame rate, update `FRAME` in `HeroVideo.tsx` to match.
+
 ## Design notes
 
 - Moody editorial look: dark aerial-sea hero, warm greige sections

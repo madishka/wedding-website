@@ -16,6 +16,14 @@ import { useEffect } from "react";
  * scroll-driven rotation and must stay centered and fully opaque for
  * the whole scroll runway, so Hero.tsx passes `fadeContent={false}`
  * there — the backdrop zoom still applies in both modes.
+ *
+ * When the hero has a scroll runway (`.hero-scroll-space`, rendered in
+ * video mode — see Hero.tsx), everything is stretched over the runway
+ * plus the curtain that follows — the whole time any of the hero is on
+ * screen. The text drifts the same total distance, just more slowly, and
+ * finishes fading exactly as the content covers it, same as it does
+ * without a runway. (Fading it out over the first viewport and then
+ * holding it half-visible for the rest of the runway read as a stall.)
  */
 export function HeroMotion({ fadeContent = true }: { fadeContent?: boolean }) {
   useEffect(() => {
@@ -23,20 +31,23 @@ export function HeroMotion({ fadeContent = true }: { fadeContent?: boolean }) {
 
     const inner = document.querySelector<HTMLElement>(".hero-inner");
     const bg = document.querySelector<HTMLElement>(".hero-bg");
+    const runway = document.querySelector<HTMLElement>(".hero-scroll-space");
     if (!inner || !bg) return;
 
     let raf = 0;
     const update = () => {
       raf = 0;
       const vh = window.innerHeight;
-      const y = Math.min(window.scrollY, vh);
-      const p = y / vh; // 0 → 1 across the first viewport
+      // 0 → 1 over the hero's visible lifetime: the first viewport when
+      // there's no runway, runway + curtain when there is.
+      const range = vh + (runway?.offsetHeight ?? 0);
+      const p = Math.min(window.scrollY, range) / range;
       if (fadeContent) {
-        inner.style.transform = `translate3d(0, ${y * -0.28}px, 0)`;
+        inner.style.transform = `translate3d(0, ${p * vh * -0.28}px, 0)`;
         inner.style.opacity = String(1 - p * 0.85);
       }
       // keep the drift smaller than what the zoom covers, so no edge gap
-      bg.style.transform = `translate3d(0, ${y * 0.025}px, 0) scale(${1 + p * 0.06})`;
+      bg.style.transform = `translate3d(0, ${p * vh * 0.025}px, 0) scale(${1 + p * 0.06})`;
     };
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(update);

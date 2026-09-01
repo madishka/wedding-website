@@ -152,13 +152,11 @@ body::after {
   flex-direction: column;
   overflow: hidden;
   color: var(--white);
-}
 
-.hero-bg {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background-image: radial-gradient(
+  /* Darkening over the backdrop that keeps the type legible. Shared by
+     the photo (baked into its background-image) and the video (a layer
+     on top, .hero-video-scrim), so the two modes read identically. */
+  --hero-scrim: radial-gradient(
       ellipse 56% 42% at 50% 44%,
       rgba(15, 23, 27, 0.38),
       rgba(15, 23, 27, 0) 72%
@@ -168,11 +166,52 @@ body::after {
       rgba(18, 28, 32, 0.5),
       rgba(18, 28, 32, 0.22) 40%,
       rgba(18, 28, 32, 0.42) 100%
-    ),
-    url("/hero-sea.jpg");
+    );
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: var(--hero-scrim), url("/hero-sea.jpg");
   background-size: cover;
   background-position: center 62%;
   will-change: transform;
+}
+
+/* Video backdrop (HeroVideo.tsx). Same box as .hero-bg — HeroMotion.tsx
+   applies its zoom/drift to whichever one is present — but the picture
+   is a <video> child and the scrim a sibling layer over it. Dark fill
+   behind both so nothing flashes paper-white before the poster paints. */
+.hero-bg-video {
+  background-image: none;
+  background-color: #132029;
+  overflow: hidden;
+}
+
+.hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 62%;
+  pointer-events: none;
+}
+
+.hero-video-scrim {
+  position: absolute;
+  inset: 0;
+  background-image: var(--hero-scrim);
+}
+
+/* Scroll runway for the video scrub (see Hero.tsx / HeroVideo.tsx): extra
+   scrolling before the content sections start sliding over the hero.
+   The clip, the names' drift/fade and the zoom all play out over this
+   plus the curtain that follows. Longer = slower, more deliberate push,
+   but also a longer wait for the next section. */
+.hero-scroll-space {
+  height: 60vh;
 }
 
 /*
