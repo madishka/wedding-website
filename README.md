@@ -292,10 +292,12 @@ deepens as details firm up. No second send, no "ignore the old link".
 
 - Moody editorial look: dark aerial-sea hero, warm greige sections
   (`#F4F2ED` / `#EAE6DD`), deep ink `#202B36`.
-- Type: [Italiana](https://fonts.google.com/specimen/Italiana) display,
-  [Imperial Script](https://fonts.google.com/specimen/Imperial+Script) accents,
-  [Jost](https://fonts.google.com/specimen/Jost) body — all self-hosted via
-  Fontsource (no Google request at build or runtime).
+- Type: [Cormorant Garamond](https://fonts.google.com/specimen/Cormorant+Garamond)
+  display, [Imperial Script](https://fonts.google.com/specimen/Imperial+Script)
+  accents, [Jost](https://fonts.google.com/specimen/Jost) body — all self-hosted
+  via Fontsource (no Google request at build or runtime). Imperial Script is
+  now only used for the RSVP accents ("reply *by*", "Thank *you*"); the names
+  lockup sets its "and" in the display face.
 - `public/hero-sea.jpg` is a procedurally generated abstract sea (SVG
   turbulence, no photography). Drop any dark moody image at that path to
   replace it — the overlay gradient in `.hero-bg` keeps the type legible.

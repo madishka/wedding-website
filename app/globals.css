@@ -1,7 +1,7 @@
 /* ————————————————————————————————————————————————
    Madelaine & Philip · Save the Date
    Moody editorial: dark aerial sea, warm greige, deep ink.
-   Type: Italiana (display) + Imperial Script (accents) + Jost (body).
+   Type: Cormorant Garamond (display) + Imperial Script (accents) + Jost (body).
    ———————————————————————————————————————————————— */
 
 :root {
@@ -17,7 +17,12 @@
   --field-border: #c9c5bb;
   --sea-deep: #1c2e32;
 
-  --font-display: "Italiana";
+  /* Cormorant Garamond: a classic wedding serif. Replaced Italiana, whose
+     very thin strokes and stylised letterforms read as fussy at display
+     size. Softer, warmer, and far more legible small and on mobile. */
+  --font-display: "Cormorant Garamond Variable";
+  /* Kept for the RSVP accents only ("reply by", "Thank you") — deliberately
+     no longer used in the names lockup. */
   --font-script: "Imperial Script";
   --font-body: "Jost Variable";
 
@@ -338,7 +343,10 @@ body::after {
   flex-direction: column;
   align-items: center;
   font-family: var(--font-display), serif;
-  font-weight: 400;
+  /* Cormorant sets lighter than Italiana did at the same weight, and the
+     names carry more of the page than anything else. 500 holds the same
+     visual presence without reading as bold. */
+  font-weight: 500;
   text-transform: uppercase;
   font-size: clamp(3.4rem, 10.5vw, 7.2rem);
   line-height: 0.98;
@@ -346,13 +354,16 @@ body::after {
 }
 
 .script-and {
-  font-family: var(--font-script), cursive;
-  text-transform: none;
-  font-size: 0.38em;
-  line-height: 0.9;
-  margin: 0.08em 0;
-  letter-spacing: 0;
-  opacity: 0.95;
+  /* The display face, lowercase — not the script one. A swirly "and"
+     between two all-caps names was the fussiest thing on the page. */
+  font-family: var(--font-display), serif;
+  font-style: italic;
+  text-transform: lowercase;
+  font-size: 0.34em;
+  line-height: 1;
+  margin: 0.1em 0;
+  letter-spacing: 0.04em;
+  opacity: 0.92;
 }
 
 .hero-sub {
