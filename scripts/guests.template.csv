@@ -3,5 +3,7 @@ EXAMPLE — delete this row,eric@example.com,+15551234567,whatsapp,wedding,Eric 
 EXAMPLE — delete this row,,,,,Rebecca Chen,adult,Same household name = same link. Leave the rest blank.
 EXAMPLE — delete this row,,,,,Mia Chen,child,adult / child / infant / plus_one
 EXAMPLE — single guest,sofia@example.com,,email,wedding,Sofia Marino,adult,
-EXAMPLE — unnamed plus one,tom@example.com,,email,wedding,Tom Whitfield,adult,
-EXAMPLE — unnamed plus one,,,,,,plus_one,"Blank name is allowed ONLY for plus_one. Shows as ""and guest""."
+Carly & Brandon,carly@example.com,,whatsapp,wedding,Carly Amsterdam,adult,"EXAMPLE — no shared surname. Household is internal, so name it whatever helps YOU find it."
+Carly & Brandon,,,,,Brandon,plus_one,"First name only is fine. Guests see ""Dear Carly and Brandon""."
+EXAMPLE — unknown plus one,tom@example.com,,email,wedding,Tom Whitfield,adult,
+EXAMPLE — unknown plus one,,,,,,plus_one,"Blank name allowed ONLY for plus_one. Shows as ""and guest""."

@@ -27,7 +27,11 @@ export const metadata: Metadata = {
 const MOCK_PARTY: Party = {
   id: "preview",
   token: "preview",
-  displayName: "The Rivera Family",
+  // Deliberately the awkward real case, not a tidy one: a household whose
+  // two people do not share a surname, and a plus-one we only know the first
+  // name of. The household's own name is internal, so it can be anything
+  // that reads well on the links spreadsheet.
+  displayName: "Carly & Brandon",
   contactEmail: "preview@example.com",
   contactPhone: null,
   softResponse: null,
@@ -35,8 +39,8 @@ const MOCK_PARTY: Party = {
   hasPassword: false,
   passwordSetAt: null,
   guests: [
-    { id: "g1", name: "Jordan Rivera", guestType: "adult", sortOrder: 0 },
-    { id: "g2", name: "Casey Rivera", guestType: "adult", sortOrder: 1 },
+    { id: "g1", name: "Carly Amsterdam", guestType: "adult", sortOrder: 0 },
+    { id: "g2", name: "Brandon", guestType: "plus_one", sortOrder: 1 },
   ],
   events: [
     {
@@ -153,7 +157,7 @@ export default async function PreviewPage({
         <TravelStay />
 
         <SoftRsvp
-          householdName={party.displayName}
+          guestNames={householdGreeting(party.guests, party.displayName)}
           initialResponse={party.softResponse}
           initialEmail={party.contactEmail}
           initialNote={party.softNote}

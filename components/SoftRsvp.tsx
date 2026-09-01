@@ -16,13 +16,20 @@ type Status = "idle" | "submitting" | "done" | "error";
  * someone else's invitation.
  */
 export function SoftRsvp({
-  householdName,
+  guestNames,
   initialResponse,
   initialEmail,
   initialNote,
   replyBy,
 }: {
-  householdName: string;
+  /**
+   * The people, by first name — "Carly and Brandon" — not the household's
+   * internal name. Those are not the same thing: a household called
+   * "Amsterdam Household" may well contain a Brandon who is not an
+   * Amsterdam, and asking "Can Amsterdam Household come?" would put a
+   * surname on someone who doesn't have it.
+   */
+  guestNames: string;
   initialResponse: "yes" | "no" | null;
   initialEmail: string | null;
   initialNote: string | null;
@@ -115,7 +122,7 @@ export function SoftRsvp({
         {/* Right column: the form itself, a single stack of fields. */}
         <form onSubmit={onSubmit}>
           <fieldset className="field">
-            <legend>Can {householdName} come?</legend>
+            <legend>Can {guestNames} come?</legend>
             <div className="option-stack" role="radiogroup">
               <button
                 type="button"

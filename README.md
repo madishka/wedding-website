@@ -84,7 +84,7 @@ The columns:
 
 | Column | Needed? | What it does |
 | --- | --- | --- |
-| `Household` | **yes** | Groups people onto one link. Repeat it on every row of that household. |
+| `Household` | **yes** | Groups people onto one link. Repeat it on every row of that household. **Internal — guests never see it.** |
 | `Guest Name` | **yes** | One row per person. Blank only for an unnamed plus-one. |
 | `Guest Type` | | `adult` / `child` / `infant` / `plus_one`. Defaults to `adult`. |
 | `Contact Email` | | Where the real invitation goes. First row of the household only. |
@@ -97,9 +97,20 @@ Three rules the importer enforces, so it's worth knowing them up front:
 
 - **Household-level fields only need filling on the first row** of each
   household. Leave them blank on the rest.
-- **The household name is the identity.** Re-importing matches on it, so
-  editing the sheet updates in place instead of duplicating. Change a
-  household's *name* and you create a second household with a second link.
+- **The household name is never shown to guests.** It groups people onto a
+  link and it is how re-imports match, nothing more. The site addresses
+  people by their own first names — the welcome note says "Dear Carly and
+  Brandon," and the RSVP asks "Can Carly and Brandon come?", both built from
+  the `Guest Name` column. So name households whatever helps *you* find them
+  in the spreadsheet. This matters for couples who don't share a surname: a
+  household can be "Carly & Brandon" without putting Carly's surname on
+  Brandon anywhere.
+- **First name only is fine.** If you don't know a plus-one's surname, put
+  just "Brandon" in `Guest Name`. Leave it blank entirely and they appear as
+  "and guest" instead.
+- **The household name is the identity for re-imports.** Editing the sheet
+  updates in place, but changing a household's *name* creates a second
+  household with a second link. Rename with care once links are sent.
 - **A blank `Guest Name` is only allowed when `Guest Type` is `plus_one`.**
   That's how you add a "+1" whose name you don't know yet — they show up in
   the welcome note as "and guest".

@@ -125,7 +125,7 @@ export default async function PartyPage({
         <TravelStay />
 
         <SoftRsvp
-          householdName={party.displayName}
+          guestNames={householdGreeting(party.guests, party.displayName)}
           initialResponse={party.softResponse}
           initialEmail={party.contactEmail}
           initialNote={party.softNote}
