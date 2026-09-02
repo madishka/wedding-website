@@ -1,4 +1,5 @@
 import { Hero, type HeroBackdrop } from "@/components/Hero";
+import { SectionVideo, type MidVideoConfig } from "@/components/SectionVideo";
 import { SoftRsvp } from "@/components/SoftRsvp";
 import { TravelStay } from "@/components/TravelStay";
 import { Reveal } from "@/components/Reveal";
@@ -83,8 +84,18 @@ const MOCK_PARTY: Party = {
 
 export function PreviewSite({
   heroBackdrop = "video",
+  midVideo,
+  emblem = true,
 }: {
   heroBackdrop?: HeroBackdrop;
+  /**
+   * Clip behind weekend+travel; omitted = SectionVideo's default,
+   * null = no mid video at all (solid dark sections, as the token
+   * page currently has).
+   */
+  midVideo?: MidVideoConfig | null;
+  /** The turning emblem in the RSVP card. */
+  emblem?: boolean;
 }) {
   const party = MOCK_PARTY;
   const { couple, dateLabel, placeLabel, replyBy } = siteConfig;
@@ -93,6 +104,15 @@ export function PreviewSite({
     <>
       <main>
         <Hero backdrop={heroBackdrop} />
+
+        {/* Weekend + travel share one scroll-scrubbed backdrop (the Oia
+            blue-hour clip), pinned behind both while they scroll past —
+            see SectionVideo.tsx. Inside .mid the two sections go
+            transparent and their cards frost over the footage. With
+            midVideo null (the token page's current look) the wrapper is
+            a plain div and the sections keep their solid dark bands. */}
+        <div className={midVideo === null ? undefined : "mid"}>
+        {midVideo !== null && <SectionVideo config={midVideo} />}
 
         <section className="weekend" id="weekend">
           <div className="container">
@@ -156,6 +176,7 @@ export function PreviewSite({
         </section>
 
         <TravelStay />
+        </div>
 
         <SoftRsvp
           guestNames={householdGreeting(party.guests, party.displayName)}
@@ -163,7 +184,7 @@ export function PreviewSite({
           initialEmail={party.contactEmail}
           initialNote={party.softNote}
           replyBy={replyBy}
-          emblem
+          emblem={emblem}
         />
       </main>
 

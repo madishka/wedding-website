@@ -38,9 +38,8 @@ export function SoftRsvp({
   initialNote: string | null;
   replyBy: { month: string; day: string; year: string };
   /**
-   * Show the turning emblem above "Kindly reply by" (EmblemRsvp.tsx).
-   * On for the dev previews while it's being tried out; the token page
-   * can switch it on with the same prop.
+   * Show the turning emblem in the card's left column (EmblemRsvp.tsx).
+   * On for both the previews and the token page.
    */
   emblem?: boolean;
 }) {

@@ -475,6 +475,73 @@ body::after {
   transform: translateZ(0);
 }
 
+/* ——— mid-section video backdrop (SectionVideo.tsx) ——— */
+
+/* Wrapper around weekend + travel: holds the pinned, scrubbed Oia clip
+   behind both. The backdrop is absolute over the wrapper's full height;
+   the sticky child inside it is what actually pins for a viewport at a
+   time. (overflow: clip, never hidden — hidden would create a scroll
+   container and break the stickiness.) */
+.mid {
+  position: relative;
+}
+
+.mid-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: clip;
+}
+
+.mid-backdrop-sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+}
+
+.mid-backdrop video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* Heavy grade over the light footage: it should read as texture behind
+   the dark world, not a bright window in it. Bottom fades to the RSVP
+   section's solid tone so the seam is invisible. */
+.mid-video-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(13, 19, 26, 0.72),
+    rgba(13, 19, 26, 0.62) 30%,
+    rgba(13, 19, 26, 0.7) 78%,
+    #10171f 100%
+  );
+}
+
+/* Inside the wrapper the sections give up their solid backgrounds so
+   the clip shows through; their cards frost over it instead. Without
+   the wrapper (the token page, for now) they keep their solid tones. */
+.mid .weekend,
+.mid .travel {
+  background: transparent;
+}
+
+.mid .event-card {
+  background: rgba(11, 17, 23, 0.45);
+  border-color: rgba(255, 255, 255, 0.18);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.mid .event-card:not(.featured):hover {
+  background: rgba(11, 17, 23, 0.62);
+}
+
 /* The bands still alternate, just in depths of night instead of
    paper/stone — darkening toward the footer, which lands on the same
    tone the public root's gradient bottoms out at. */

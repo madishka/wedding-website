@@ -358,15 +358,21 @@ deepens as details firm up. No second send, no "ignore the old link".
 
 ## Previewing without a database
 
-`/preview` (dev-only, 404s in production) renders the full token page
-with mock data — no Supabase, no link needed. Behind the hero it uses
-the caldera drone clip, **scrubbed by scroll**: scrolling down pushes
-the drone forward, scrolling up pulls it back.
+Two dev-only routes (404 in production) render the token page layout
+with mock data — no Supabase, no link needed:
 
-The video is `components/HeroVideo.tsx`; the `backdrop` prop on `Hero`
-switches between the clip and the still photo (`public/hero-sea.jpg`
-with a slow zoom), so the real `/i/[token]` page can adopt either with
-a one-word change.
+| Route | What it shows |
+| --- | --- |
+| `/preview` | The experiments: everything the token page has, plus the Oia clip pinned+scrubbed behind weekend/travel |
+| `/preview-token` | What the real `/i/[token]` page composes **today**: the scrubbed caldera hero and RSVP emblem, but solid dark sections (no mid clip yet) |
+
+The scrub machinery is `components/useVideoScrub.ts`; `HeroVideo` and
+`SectionVideo` consume it. Promoting an experiment to the token page
+is a matter of flipping the same props `/preview` passes — and
+updating `/preview-token` to match.
+
+Clips are re-encoded for scrubbing by `scripts/encode-hero-video.sh`
+and `scripts/encode-mid-video.sh` (each documents its choices).
 
 ### Re-encoding the hero clip
 

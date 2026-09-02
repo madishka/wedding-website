@@ -49,8 +49,10 @@ export default async function PartyPage({
   return (
     <>
       <main>
-        {/* Full hero — date and place appear only here, behind the token. */}
-        <Hero />
+        {/* Full hero — date and place appear only here, behind the token.
+            The caldera clip, scrubbed by scroll (same as the public root
+            and /preview). */}
+        <Hero backdrop="video" />
 
         {/* The welcome note lives inside the RSVP card now (SoftRsvp),
             so the page goes straight to the weekend. */}
@@ -123,6 +125,7 @@ export default async function PartyPage({
           initialEmail={party.contactEmail}
           initialNote={party.softNote}
           replyBy={replyBy}
+          emblem
         />
       </main>
 
