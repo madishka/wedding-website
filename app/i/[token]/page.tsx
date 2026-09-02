@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { Hero } from "@/components/Hero";
 import { PasswordGate } from "@/components/PasswordGate";
 import { SoftRsvp } from "@/components/SoftRsvp";
-import { WelcomeNote } from "@/components/WelcomeNote";
 import { TravelStay } from "@/components/TravelStay";
 import { Reveal } from "@/components/Reveal";
 import { getPartyByToken, markOpened } from "@/lib/party";
@@ -53,14 +52,8 @@ export default async function PartyPage({
         {/* Full hero — date and place appear only here, behind the token. */}
         <Hero />
 
-        {siteConfig.sections.welcomeNote && (
-          <WelcomeNote
-            greeting={householdGreeting(party.guests, party.displayName)}
-          />
-        )}
-
-        {/* The household is named in the welcome note above, so this section
-            is just the weekend itself. */}
+        {/* The welcome note lives inside the RSVP card now (SoftRsvp),
+            so the page goes straight to the weekend. */}
         <section className="weekend" id="weekend">
           <div className="container">
             <Reveal>

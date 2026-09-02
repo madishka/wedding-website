@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { EmblemRsvp } from "./EmblemRsvp";
+import { siteConfig } from "@/lib/site-config";
 
 type Status = "idle" | "submitting" | "done" | "error";
 
@@ -104,14 +105,22 @@ export function SoftRsvp({
   return (
     <section className="rsvp" id="rsvp">
       <div className="container rsvp-grid">
-        {/* Left column: the editorial block, as the original design had it. */}
+        {/* Left column: the welcome note, folded into the RSVP card —
+            greeting by name, the message, the reply-by date, and the
+            don't-share housekeeping, all in one place. */}
         <div className="rsvp-copy">
           {emblem && <EmblemRsvp />}
-          <h2 className="rsvp-title">
-            Kindly
-            <br />
-            reply by
-          </h2>
+          <p className="eyebrow">{siteConfig.welcomeNote.eyebrow}</p>
+          <h2 className="rsvp-title">{siteConfig.welcomeNote.title}</h2>
+          <p className="rsvp-greeting">
+            {siteConfig.welcomeNote.greeting} {guestNames},
+          </p>
+          {siteConfig.welcomeNote.paragraphs.map((text, i) => (
+            <p key={i} className="rsvp-note">
+              {text}
+            </p>
+          ))}
+          <p className="rsvp-reply-label">Kindly reply by</p>
           <p className="rsvp-date">
             <span>{replyBy.month}</span>
             <span className="bar" aria-hidden="true" />
@@ -119,12 +128,9 @@ export function SoftRsvp({
             <span className="bar" aria-hidden="true" />
             <span>{replyBy.year}</span>
           </p>
-          <p className="rsvp-note">
-            Nothing binding — a quick yes or no is all we need this early,
-            so we can get a rough sense of numbers.
-          </p>
-          <p className="rsvp-note">
-            Additional details to follow.
+          <p className="rsvp-aside">
+            Every invite is personal. Please do not share your invite link
+            with others.
           </p>
         </div>
 

@@ -75,11 +75,9 @@ export const siteConfig = {
    * Which sections appear behind a guest's link.
    *
    * The site grows as logistics firm up — flip a flag, no code changes.
-   * Order on the page is fixed: hero → welcome → weekend → travel → rsvp.
+   * Order on the page is fixed: hero → weekend → travel → rsvp.
    */
   sections: {
-    welcomeNote: true,
-
     /** How to reach Santorini. Evergreen and already accurate. */
     gettingThere: true,
 
@@ -99,10 +97,11 @@ export const siteConfig = {
   replyBy: { month: "October", day: "1", year: "2026" },
 
   /**
-   * The welcome note.
-   *
-   * The greeting line is built from the household's actual guests at render
-   * time — see lib/names.ts — so this is only the body around it.
+   * The note from us. No longer its own section — it opens the RSVP
+   * card (SoftRsvp.tsx, left column), so the greeting, the message and
+   * the ask to reply all live in one place. The greeting line is built
+   * from the household's actual guests at render time — see
+   * lib/names.ts — so this is only the body around it.
    */
   welcomeNote: {
     eyebrow: "A note from us",

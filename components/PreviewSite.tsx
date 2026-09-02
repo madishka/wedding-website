@@ -1,6 +1,5 @@
 import { Hero, type HeroBackdrop } from "@/components/Hero";
 import { SoftRsvp } from "@/components/SoftRsvp";
-import { WelcomeNote } from "@/components/WelcomeNote";
 import { TravelStay } from "@/components/TravelStay";
 import { Reveal } from "@/components/Reveal";
 import { siteConfig } from "@/lib/site-config";
@@ -94,12 +93,6 @@ export function PreviewSite({
     <>
       <main>
         <Hero backdrop={heroBackdrop} />
-
-        {siteConfig.sections.welcomeNote && (
-          <WelcomeNote
-            greeting={householdGreeting(party.guests, party.displayName)}
-          />
-        )}
 
         <section className="weekend" id="weekend">
           <div className="container">

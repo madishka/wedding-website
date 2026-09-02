@@ -37,7 +37,9 @@ html {
 }
 
 body {
-  background: var(--paper);
+  /* The darkest section tone, not paper: every surface on the site is
+     dark now, so overscroll and pre-paint flashes should be too. */
+  background: #0b1117;
   color: var(--ink);
   font-family: var(--font-body), sans-serif;
   font-weight: 300;
@@ -432,12 +434,30 @@ body::after {
 
 /* ——— the weekend ——— */
 
-/* sections that ride over the pinned hero */
-.welcome,
+/* Sections that ride over the pinned hero.
+
+   They are DARK — one continuous moody world from the video hero down
+   to the footer — done by remapping the palette variables in this
+   scope rather than restyling each component: anything set in "ink on
+   paper" terms inverts to "bone on night" automatically, and emphasis
+   flips with it (the featured card and the submit button come out
+   light-on-dark, the way .gate-submit already does). */
 .weekend,
 .travel,
 .rsvp,
 .footer {
+  --ink: #efeadf; /* what was ink is now bone */
+  --ink-2: #cfd6dc;
+  --muted: #97a1ab;
+  --line: rgba(255, 255, 255, 0.16);
+  --line-stone: rgba(255, 255, 255, 0.16);
+  --white: #223040; /* raised dark surface (cards, inputs) */
+  --paper: #10161d;
+  --stone: #151d26;
+  --field: rgba(255, 255, 255, 0.08);
+  --field-border: rgba(255, 255, 255, 0.26);
+  color: var(--ink);
+
   position: relative;
   z-index: 1;
   /* Each section gets its own compositing layer, explicitly.
@@ -455,10 +475,13 @@ body::after {
   transform: translateZ(0);
 }
 
+/* The bands still alternate, just in depths of night instead of
+   paper/stone — darkening toward the footer, which lands on the same
+   tone the public root's gradient bottoms out at. */
 .weekend {
   padding: clamp(5rem, 10vw, 8.5rem) 0;
-  background: var(--paper);
-  box-shadow: 0 -28px 56px -18px rgba(15, 23, 27, 0.45);
+  background: #1b2530;
+  box-shadow: 0 -28px 56px -18px rgba(4, 8, 12, 0.65);
 }
 
 .event-grid {
@@ -536,18 +559,24 @@ body::after {
   color: var(--white);
 }
 
+/* On the dark sections the featured card comes out light (see the
+   variable remap above), so its secondary text goes dark, not white. */
 .event-card.featured .event-date {
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(32, 43, 54, 0.6);
 }
 
 .event-card.featured .event-body {
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(32, 43, 54, 0.75);
+}
+
+.event-card.featured {
+  color: #202b36;
 }
 
 /* ——— travel & stay ——— */
 
 .travel {
-  background: var(--stone);
+  background: #151d26;
   padding: clamp(5rem, 10vw, 8rem) 0;
 }
 
@@ -661,47 +690,10 @@ body::after {
   color: var(--muted);
 }
 
-/* ——— welcome note ——— */
-
-.welcome {
-  /* stone → paper (weekend) → stone (travel) → white (rsvp) keeps the
-     bands alternating as sections get switched on and off. */
-  background: var(--stone);
-  padding: clamp(5rem, 10vw, 8.5rem) 0;
-}
-
-.welcome-body {
-  max-width: 46ch;
-  margin: clamp(2rem, 4vw, 3rem) auto 0;
-  text-align: center;
-}
-
-.welcome-body p {
-  margin: 0 0 1.25rem;
-  line-height: 1.75;
-}
-
-/* "Dear Eric, Rebecca and Mia," — sits above the body copy as the opening
-   line of a letter, so it keeps the body's measure rather than centring. */
-.welcome-greeting {
-  margin-bottom: 1.4rem;
-}
-
-.welcome-aside {
-  max-width: 52ch;
-  margin: clamp(2.5rem, 5vw, 4rem) auto 0;
-  padding-top: clamp(1.75rem, 3.5vw, 2.5rem);
-  border-top: 1px solid var(--line-stone);
-  text-align: center;
-  font-size: 0.9rem;
-  line-height: 1.7;
-  opacity: 0.75;
-}
-
 /* ——— rsvp ——— */
 
 .rsvp {
-  background: var(--white);
+  background: #10171f;
   padding: clamp(5rem, 10vw, 8.5rem) 0;
 }
 
@@ -733,20 +725,51 @@ body::after {
   display: block;
 }
 
+/* Sized for the longer merged title ("We're so glad you're here"), not
+   the old two-word "Kindly reply by". */
 .rsvp-title {
   font-family: var(--font-display), serif;
   font-weight: 400;
-  font-size: clamp(2.8rem, 5.5vw, 4.4rem);
-  line-height: 1.02;
+  font-size: clamp(2.1rem, 3.6vw, 3rem);
+  line-height: 1.08;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  margin-top: 0.9rem;
+}
+
+/* "Dear Carly and Brandon," — the opening line of a letter. */
+.rsvp-greeting {
+  margin-top: 1.8rem;
+  line-height: 1.75;
+}
+
+/* Small-caps lead-in to the date block, doing the work the old giant
+   "Kindly reply by" title used to. */
+.rsvp-reply-label {
+  margin-top: 2.2rem;
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* The don't-share housekeeping, set apart like the old welcome aside. */
+.rsvp-aside {
+  max-width: 24rem;
+  margin-top: 2.4rem;
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.82rem;
+  line-height: 1.7;
+  color: var(--muted);
 }
 
 .rsvp-date {
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-top: 1.8rem;
+  margin-top: 0.9rem;
   font-size: 0.78rem;
   letter-spacing: 0.35em;
   text-transform: uppercase;
@@ -806,7 +829,7 @@ body::after {
 .field textarea:focus {
   outline: none;
   border-color: var(--ink);
-  box-shadow: 0 0 0 3px rgba(32, 43, 54, 0.12);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.14);
 }
 
 .field textarea {
@@ -879,7 +902,7 @@ body::after {
   margin-bottom: 1rem;
   font-size: 0.85rem;
   font-weight: 400;
-  color: #9c3a32;
+  color: #e59a90; /* readable red on the dark card */
 }
 
 .rsvp-success {
@@ -910,7 +933,14 @@ body::after {
   border-top: 1px solid var(--line);
   padding: clamp(3.5rem, 6vw, 5rem) 0 3rem;
   text-align: center;
-  background: var(--paper);
+  background: #0b1117;
+}
+
+/* The monogram PNG is ink-on-transparent; recolor it for the dark
+   ground, same trick as the hero overlay. */
+.footer .monogram-img {
+  filter: brightness(0) invert(0.92);
+  opacity: 0.95;
 }
 
 .monogram-img {
@@ -1186,7 +1216,8 @@ body::after {
     justify-content: center;
   }
 
-  .rsvp-note {
+  .rsvp-note,
+  .rsvp-aside {
     margin-inline: auto;
   }
 

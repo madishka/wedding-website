@@ -8,10 +8,9 @@ export type HeroBackdrop = "image" | "video";
 /** Built from the visible sections, so the nav never links to a section
  *  that is switched off in lib/site-config.ts. */
 function buildNav() {
-  const { welcomeNote, gettingThere, whereToStay } = siteConfig.sections;
+  const { gettingThere, whereToStay } = siteConfig.sections;
   return [
     { label: "Save the date", href: "#top" },
-    ...(welcomeNote ? [{ label: "Welcome", href: "#welcome" }] : []),
     { label: "The weekend", href: "#weekend" },
     ...(gettingThere || whereToStay
       ? [{ label: "Travel & stay", href: "#travel" }]
