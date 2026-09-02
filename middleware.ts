@@ -49,15 +49,12 @@ export function middleware(req: NextRequest) {
     return noindex(NextResponse.next());
   }
 
-  // Dev-only previews of the full site with mock data, no Supabase or
-  // real token needed — /preview (the experiments) and /preview-token
-  // (what the real token page composes today); see PreviewSite.tsx.
-  // Those pages 404 themselves outside development; this just keeps
-  // the gate from redirecting them away before they get the chance to.
-  if (
-    (pathname === "/preview" || pathname.startsWith("/preview-")) &&
-    process.env.NODE_ENV !== "production"
-  ) {
+  // Dev-only preview of the full site with mock data, no Supabase or
+  // real token needed — see components/PreviewSite.tsx; it renders the
+  // same composition as /i/[token]. The page 404s itself outside
+  // development; this just keeps the gate from redirecting it away
+  // before it gets the chance to.
+  if (pathname === "/preview" && process.env.NODE_ENV !== "production") {
     return noindex(NextResponse.next());
   }
 

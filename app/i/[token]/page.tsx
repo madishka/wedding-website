@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Hero } from "@/components/Hero";
 import { PasswordGate } from "@/components/PasswordGate";
+import { SectionVideo } from "@/components/SectionVideo";
 import { SoftRsvp } from "@/components/SoftRsvp";
 import { TravelStay } from "@/components/TravelStay";
 import { Reveal } from "@/components/Reveal";
@@ -55,7 +56,13 @@ export default async function PartyPage({
         <Hero backdrop="video" />
 
         {/* The welcome note lives inside the RSVP card now (SoftRsvp),
-            so the page goes straight to the weekend. */}
+            so the page goes straight to the weekend. Weekend + travel
+            share the pinned, scroll-scrubbed Oia clip — see
+            SectionVideo.tsx; inside .mid the sections go transparent
+            and their cards frost over the footage. */}
+        <div className="mid">
+        <SectionVideo />
+
         <section className="weekend" id="weekend">
           <div className="container">
             <Reveal>
@@ -118,6 +125,7 @@ export default async function PartyPage({
         </section>
 
         <TravelStay />
+        </div>
 
         <SoftRsvp
           guestNames={householdGreeting(party.guests, party.displayName)}
