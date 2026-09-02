@@ -152,10 +152,15 @@ body::after {
   flex-direction: column;
   overflow: hidden;
   color: var(--white);
+}
 
-  /* Darkening over the backdrop that keeps the type legible. Shared by
-     the photo (baked into its background-image) and the video (a layer
-     on top, .hero-video-scrim), so the two modes read identically. */
+/* Darkening over the hero backdrop that keeps the type legible. Shared
+   by the photo (baked into its background-image), the video (a layer on
+   top, .hero-video-scrim) and the password gate, so they all read
+   identically. On :root, NOT .hero — the gate uses .hero-bg outside any
+   .hero, and an undefined var() silently invalidates the whole
+   background-image declaration. */
+:root {
   --hero-scrim: radial-gradient(
       ellipse 56% 42% at 50% 44%,
       rgba(15, 23, 27, 0.38),
@@ -973,6 +978,105 @@ body::after {
   position: absolute;
   inset: 0;
   z-index: 0;
+  /* The gate's own photograph (public/gate-bg.*, hand-encoded from
+     IMG_2199.HEIC at 2000px — see README on re-encoding). AVIF for
+     browsers that take image-set(), the bare JPEG line above it as the
+     fallback; the shared scrim keeps the type legible over the bright
+     day-lit sea. Position biases toward the water so the form sits on
+     the dark blue, not the sky. */
+  background-image: var(--hero-scrim), url("/gate-bg.jpg");
+  background-image: var(--hero-scrim),
+    image-set(
+      url("/gate-bg.avif") type("image/avif"),
+      url("/gate-bg.jpg") type("image/jpeg")
+    );
+  background-position: center 60%;
+
+  /* Ken Burns drift: the page has no scroll to drive motion, so the
+     photo breathes on a clock instead — a very slow zoom-and-pan that
+     eases back and forth forever. The pointer parallax (PasswordGate.tsx)
+     rides along inside the same transform via --gate-par-x/y, so the two
+     never fight over the property. The keyframes' scale always exceeds
+     pan + parallax, so no edge can ever show. */
+  transform: translate3d(var(--gate-par-x, 0px), var(--gate-par-y, 0px), 0)
+    scale(1.04);
+  animation: gate-drift 50s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes gate-drift {
+  from {
+    transform: translate3d(
+        calc(var(--gate-par-x, 0px) - 0.5%),
+        calc(var(--gate-par-y, 0px) + 0.3%),
+        0
+      )
+      scale(1.03);
+  }
+  to {
+    transform: translate3d(
+        calc(var(--gate-par-x, 0px) + 0.5%),
+        calc(var(--gate-par-y, 0px) - 0.3%),
+        0
+      )
+      scale(1.09);
+  }
+}
+
+/* Title-card entrance: same .enter mechanics as the hero, but slower
+   and more deliberate — names first, then the rule draws itself in,
+   then the form. Scoped to the gate so the hero's timings stay put. */
+.gate .enter {
+  animation-duration: 1.6s;
+}
+.gate .enter-1 { animation-delay: 0.2s; }
+.gate .enter-2 { animation-delay: 1s; }
+.gate .enter-3 { animation-delay: 1.5s; }
+
+/* The rule draws from nothing instead of rising: width, not motion. */
+.gate .hero-rule.enter {
+  transform: none;
+  width: 0;
+  animation: gate-rule-draw 1.1s var(--ease) 1s forwards;
+}
+
+@keyframes gate-rule-draw {
+  to {
+    opacity: 1;
+    width: 4.5rem;
+  }
+}
+
+/* Wrong password: a short, gentle head-shake on the input. Triggered by
+   PasswordGate.tsx adding .is-shaking on each rejection. */
+.gate-form input.is-shaking {
+  animation: gate-shake 0.45s var(--ease);
+}
+
+@keyframes gate-shake {
+  15%, 85% { transform: translateX(-2px); }
+  30%, 70% { transform: translateX(4px); }
+  45%, 55% { transform: translateX(-4px); }
+}
+
+/* A pool of shade under the content: the day-lit photo is brightest in
+   exactly the band where the thin type sits, so a wide, heavily
+   feathered vignette darkens the middle. It's a sibling layer, not part
+   of .hero-bg — the photo drifts and parallaxes underneath while the
+   shade stays anchored to the UI. Painted above .hero-bg (same z-index,
+   later in paint order), below .gate-inner. */
+.gate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 54% 48% at 50% 52%,
+    rgba(10, 17, 24, 0.36),
+    rgba(10, 17, 24, 0.14) 55%,
+    rgba(10, 17, 24, 0) 78%
+  );
 }
 
 .gate-inner {
@@ -1113,11 +1217,19 @@ body::after {
   }
 
   .enter,
-  .reveal,
-  .scroll-cue-chevrons {
+  .reveal {
     opacity: 1;
     transform: none;
     animation: none;
     transition: none;
+  }
+
+  /* the gate's ambient drift and rule draw-in stop too; the shake is
+     kept — it's feedback, not decoration, and it's tiny */
+  .gate .hero-bg,
+  .gate .hero-rule.enter {
+    animation: none;
+    transform: none;
+    width: 4.5rem;
   }
 }

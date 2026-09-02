@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { siteConfig } from "@/lib/site-config";
 
@@ -22,8 +22,48 @@ export function PasswordGate() {
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState<"idle" | "submitting" | "error">("idle");
   const [error, setError] = useState("");
+  // Re-armed on every rejection so repeat wrong guesses shake again;
+  // cleared by onAnimationEnd on the input.
+  const [shaking, setShaking] = useState(false);
+
+  const bgRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
 
   const { couple } = siteConfig;
+
+  // Pointer parallax: the photo shifts a few pixels opposite the cursor
+  // (via the --gate-par-* vars folded into the Ken Burns transform, see
+  // globals.css) and the content a hair less, giving the scene depth on
+  // mouse movement. Fine pointers only — it would do nothing but waste
+  // events on touch — and off entirely under reduced motion.
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!window.matchMedia("(pointer: fine)").matches) return;
+    const bg = bgRef.current;
+    const inner = innerRef.current;
+    if (!bg || !inner) return;
+
+    let raf = 0;
+    let nx = 0;
+    let ny = 0;
+    const apply = () => {
+      raf = 0;
+      bg.style.setProperty("--gate-par-x", `${nx * -12}px`);
+      bg.style.setProperty("--gate-par-y", `${ny * -8}px`);
+      inner.style.transform = `translate3d(${nx * -4}px, ${ny * -3}px, 0)`;
+    };
+    const onMove = (e: PointerEvent) => {
+      nx = e.clientX / window.innerWidth - 0.5;
+      ny = e.clientY / window.innerHeight - 0.5;
+      if (!raf) raf = requestAnimationFrame(apply);
+    };
+
+    window.addEventListener("pointermove", onMove, { passive: true });
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -46,6 +86,7 @@ export function PasswordGate() {
       if (!res.headers.get("content-type")?.includes("application/json")) {
         setError("Your link seems to have expired. Please reopen it from our message.");
         setStatus("error");
+        setShaking(true);
         return;
       }
 
@@ -54,6 +95,7 @@ export function PasswordGate() {
       if (!res.ok) {
         setError(data.error ?? "Something went wrong. Please try again.");
         setStatus("error");
+        setShaking(true);
         return;
       }
 
@@ -63,16 +105,21 @@ export function PasswordGate() {
     } catch {
       setError("Couldn't reach us just now. Please try again.");
       setStatus("error");
+      setShaking(true);
     }
   }
 
   return (
     <main className="gate">
-      {/* Same plain gradient as the public root: the caldera photograph is
-          recognisable enough to give away the location on its own. */}
-      <div className="hero-bg hero-bg-plain" aria-hidden="true" />
+      {/* The aerial-sea photograph with its darkening scrim (the same
+          backdrop the token page's photo hero uses). Note the earlier
+          call here was the plain gradient, on the grounds that a
+          recognisable photo gives away the location to whoever holds a
+          leaked link — worth remembering if this ever swaps to a real
+          caldera shot. */}
+      <div className="hero-bg" ref={bgRef} aria-hidden="true" />
 
-      <div className="gate-inner">
+      <div className="gate-inner" ref={innerRef}>
         <h1 className="names gate-names enter enter-1">
           <span>{couple.partnerA}</span>
           <span className="script-and">and</span>
@@ -90,6 +137,8 @@ export function PasswordGate() {
             id="password"
             name="password"
             type="password"
+            className={shaking ? "is-shaking" : ""}
+            onAnimationEnd={() => setShaking(false)}
             required
             autoFocus
             autoComplete="current-password"
