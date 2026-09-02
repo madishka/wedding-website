@@ -56,7 +56,20 @@ function clamp(value: number, min: number, max: number) {
  *
  * `prefers-reduced-motion` gets the poster frame and nothing else.
  */
-export function HeroVideo() {
+export function HeroVideo({
+  runwaySelector = ".hero-scroll-space",
+  curtain = true,
+}: {
+  /** The spacer whose height is the scroll runway. */
+  runwaySelector?: string;
+  /**
+   * Whether content slides over the hero after the runway. If so the
+   * scrub range also includes that extra viewport of scrolling, so the
+   * clip keeps moving until the hero is covered. The public root has
+   * nothing after its runway, so there the runway is the whole range.
+   */
+  curtain?: boolean;
+}) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -69,7 +82,7 @@ export function HeroVideo() {
     // the play() below or the kickstart is refused on mobile.
     video.muted = true;
 
-    const runway = document.querySelector<HTMLElement>(".hero-scroll-space");
+    const runway = document.querySelector<HTMLElement>(runwaySelector);
 
     let duration = 0;
     let target = 0;
@@ -81,13 +94,25 @@ export function HeroVideo() {
     let seekTimer = 0;
 
     const targetTime = () => {
-      // Same range as HeroMotion.tsx: runway plus the viewport the
-      // content takes to slide over the hero, so the clip is still
-      // moving right up until it's covered.
-      const range = window.innerHeight + (runway?.offsetHeight ?? 0);
+      // Same range as HeroMotion.tsx: the runway, plus the viewport the
+      // content takes to slide over the hero when there is content, so
+      // the clip is still moving right up until it's covered.
+      const range =
+        (runway?.offsetHeight ?? 0) + (curtain ? window.innerHeight : 0) ||
+        window.innerHeight;
       const progress = clamp(window.scrollY / range, 0, 1);
       // Stop one frame short of the end so we never trip `ended`.
       return progress * Math.max(duration - FRAME, 0);
+    };
+
+    // The *eased* 0→1 progress, published for anything that must move
+    // in lockstep with the picture — the public root's emblem turns
+    // from this rather than from raw scroll position, so the two can't
+    // drift apart while the playhead is still chasing the scroll (see
+    // EmblemHero.tsx).
+    const publishProgress = () => {
+      const max = Math.max(duration - FRAME, Number.EPSILON);
+      video.dataset.scrubProgress = String(clamp(current / max, 0, 1));
     };
 
     const onSeeked = () => {
@@ -119,6 +144,7 @@ export function HeroVideo() {
       current += (target - current) * EASE;
       if (Math.abs(target - current) < FRAME / 4) current = target;
       seek(current);
+      publishProgress();
       if (current !== target) raf = requestAnimationFrame(tick);
     };
 
@@ -132,9 +158,16 @@ export function HeroVideo() {
     // played at least once (Safari doesn't mind). A muted play-then-pause
     // unlocks the decoder without anything visibly playing.
     const kickstart = () => {
+      // The brief play advances the playhead a frame or two past
+      // wherever the initial seek put it, so put it back afterwards.
+      const settle = () => {
+        video.pause();
+        lastSeeked = -1;
+        seek(current);
+      };
       const p = video.play();
-      if (p) p.then(() => video.pause()).catch(() => {});
-      else video.pause();
+      if (p) p.then(settle).catch(() => {});
+      else settle();
     };
 
     const onReady = () => {
@@ -145,6 +178,7 @@ export function HeroVideo() {
       // mid-scroll, instead of easing in from frame 0.
       current = target = targetTime();
       seek(current);
+      publishProgress();
     };
 
     video.addEventListener("seeked", onSeeked);
@@ -164,7 +198,7 @@ export function HeroVideo() {
       window.clearTimeout(seekTimer);
       if (raf) cancelAnimationFrame(raf);
     };
-  }, []);
+  }, [runwaySelector, curtain]);
 
   return (
     <div className="hero-bg hero-bg-video" aria-hidden="true">

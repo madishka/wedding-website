@@ -15,7 +15,11 @@ import { Hero } from "@/components/Hero";
 export default function Page() {
   return (
     <main>
-      <Hero showDetails={false} />
+      {/* Trying the caldera clip behind the emblem — scrubbed by scroll
+          over the same runway the emblem turns through. Note this shows
+          the island: the earlier rule for this page was "no photograph",
+          because the caldera is recognisable (see README). */}
+      <Hero showDetails={false} backdrop="video" />
       {/* Scroll runway: keeps the hero pinned while its emblem turns
           from 0° to 180°. Nothing follows it, so the hero stays put
           for the entire page. */}

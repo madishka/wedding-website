@@ -296,10 +296,10 @@ body::after {
   display: block;
 }
 
-/* Monogram overlay pinned to the bottom of the hero, faded in by
-   EmblemHero.tsx as the emblem finishes turning. It's the same mark and
-   copy as the token page's footer, but recolored for the dark backdrop
-   it sits on here instead of the token page's light paper background. */
+/* Monogram overlay pinned to the bottom of the hero, always visible.
+   It's the same mark and copy as the token page's footer, but recolored
+   for the dark backdrop it sits on here instead of the token page's
+   light paper background. */
 .hero-footer-overlay {
   position: absolute;
   left: 0;
@@ -307,7 +307,6 @@ body::after {
   bottom: clamp(2rem, 6vw, 3.5rem);
   z-index: 1;
   text-align: center;
-  opacity: 0;
 }
 
 .hero-footer-overlay .monogram-img {
@@ -319,45 +318,6 @@ body::after {
 .hero-footer-overlay .footer-note {
   margin-top: 1rem;
   color: rgba(255, 255, 255, 0.75);
-}
-
-/* Scroll-down nudge, faded out by EmblemHero.tsx as soon as scrolling
-   starts. Sits in the same spot .hero-footer-overlay will later occupy —
-   safe, since the two are never visible at the same time. */
-.scroll-cue {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: clamp(2rem, 6vw, 3.5rem);
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.7rem;
-  color: rgba(255, 255, 255, 0.8);
-  pointer-events: none;
-}
-
-.scroll-cue-label {
-  font-size: 0.65rem;
-  font-weight: 400;
-  letter-spacing: 0.4em;
-  text-indent: 0.4em;
-  text-transform: uppercase;
-}
-
-.scroll-cue-chevrons {
-  animation: scroll-cue-bounce 1.8s ease-in-out infinite;
-}
-
-@keyframes scroll-cue-bounce {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(7px);
-  }
 }
 
 /* Scroll runway for the emblem's 0deg -> 180deg turn (see EmblemHero.tsx

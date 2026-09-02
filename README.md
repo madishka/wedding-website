@@ -358,17 +358,15 @@ deepens as details firm up. No second send, no "ignore the old link".
 
 ## Previewing without a database
 
-Three dev-only routes render the full token page with mock data (no
-Supabase, no link needed). They 404 in production.
-
-| Route | Hero backdrop |
-| --- | --- |
-| `/preview`, `/preview-image` | `public/hero-sea.jpg`, slow scroll-linked zoom |
-| `/preview-video` | The caldera drone clip, **scrubbed by scroll** — scrolling down pushes the drone forward, scrolling up pulls it back |
+`/preview` (dev-only, 404s in production) renders the full token page
+with mock data — no Supabase, no link needed. Behind the hero it uses
+the caldera drone clip, **scrubbed by scroll**: scrolling down pushes
+the drone forward, scrolling up pulls it back.
 
 The video is `components/HeroVideo.tsx`; the `backdrop` prop on `Hero`
-switches between the two, so the real `/i/[token]` page can adopt either
-with a one-word change.
+switches between the clip and the still photo (`public/hero-sea.jpg`
+with a slow zoom), so the real `/i/[token]` page can adopt either with
+a one-word change.
 
 ### Re-encoding the hero clip
 

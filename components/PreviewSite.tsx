@@ -11,15 +11,11 @@ import type { Party } from "@/lib/types";
  * Dev-only stand-in for `/i/[token]` — same layout, but with hardcoded
  * mock data instead of a Supabase lookup, so the full site can be
  * previewed locally without setting up a database or minting a real
- * guest link.
+ * guest link. Rendered by /preview, with the scroll-scrubbed caldera
+ * clip behind the hero (`heroBackdrop` switches back to the photo).
  *
- * Rendered by three routes that differ only in the hero backdrop:
- *   /preview        — image (the current default)
- *   /preview-image  — image, explicitly
- *   /preview-video  — the scroll-scrubbed caldera clip
- *
- * Never reachable in production: each route 404s itself, and
- * middleware.ts only exempts the paths from the token gate outside
+ * Never reachable in production: the route 404s itself, and
+ * middleware.ts only exempts the path from the token gate outside
  * development too.
  */
 
@@ -86,7 +82,11 @@ const MOCK_PARTY: Party = {
   rsvps: [],
 };
 
-export function PreviewSite({ heroBackdrop }: { heroBackdrop: HeroBackdrop }) {
+export function PreviewSite({
+  heroBackdrop = "video",
+}: {
+  heroBackdrop?: HeroBackdrop;
+}) {
   const party = MOCK_PARTY;
   const { couple, dateLabel, placeLabel, replyBy } = siteConfig;
 
@@ -110,7 +110,28 @@ export function PreviewSite({ heroBackdrop }: { heroBackdrop: HeroBackdrop }) {
               </h2>
             </Reveal>
 
-            {party.events.length > 0 ? (
+            {/* Mirrors app/i/[token]/page.tsx exactly: while siteConfig.
+                weekendDetail is "outline", guests see the outline days
+                ("To be confirmed"), never the per-event mock below — so
+                the preview must too, or it previews a page that doesn't
+                exist. The per-event branch stays for when the real
+                itinerary is switched on. */}
+            {siteConfig.weekendDetail === "outline" ? (
+              <div className="event-grid">
+                {siteConfig.weekendOutline.map((day, i) => (
+                  <Reveal key={day.name} delay={i * 100}>
+                    <article
+                      className={`event-card ${day.tbd ? "" : "featured"}`}
+                    >
+                      <p className="event-date">{day.dateLabel}</p>
+                      <h3>{day.name}</h3>
+                      <p className="event-body">{day.body}</p>
+                      {day.tbd && <p className="event-tbd">To be confirmed</p>}
+                    </article>
+                  </Reveal>
+                ))}
+              </div>
+            ) : party.events.length > 0 ? (
               <div className="event-grid">
                 {party.events.map((event, i) => (
                   <Reveal key={event.id} delay={i * 100}>

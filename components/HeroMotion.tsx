@@ -31,7 +31,11 @@ export function HeroMotion({ fadeContent = true }: { fadeContent?: boolean }) {
 
     const inner = document.querySelector<HTMLElement>(".hero-inner");
     const bg = document.querySelector<HTMLElement>(".hero-bg");
-    const runway = document.querySelector<HTMLElement>(".hero-scroll-space");
+    // Either runway: the full version's video spacer, or the public
+    // root's emblem spacer (which is that page's entire scroll range).
+    const runway = document.querySelector<HTMLElement>(
+      ".hero-scroll-space, .emblem-scroll-space"
+    );
     if (!inner || !bg) return;
 
     let raf = 0;
@@ -39,8 +43,12 @@ export function HeroMotion({ fadeContent = true }: { fadeContent?: boolean }) {
       raf = 0;
       const vh = window.innerHeight;
       // 0 → 1 over the hero's visible lifetime: the first viewport when
-      // there's no runway, runway + curtain when there is.
-      const range = vh + (runway?.offsetHeight ?? 0);
+      // there's no runway; runway + the curtain that follows when there
+      // is one and content comes after it (fadeContent doubles as "this
+      // is the full version"); just the runway on the public root,
+      // where nothing follows.
+      const range =
+        (runway?.offsetHeight ?? 0) + (fadeContent ? vh : 0) || vh;
       const p = Math.min(window.scrollY, range) / range;
       if (fadeContent) {
         inner.style.transform = `translate3d(0, ${p * vh * -0.28}px, 0)`;

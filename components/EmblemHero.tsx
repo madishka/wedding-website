@@ -10,8 +10,8 @@ function clamp(value: number, min: number, max: number) {
 /**
  * The public root's hero mark: the emblem GLB, turning on its Y axis
  * as the page scrolls through `.emblem-scroll-space` (see page.tsx) —
- * 0° at the top of that space, 180° once it's fully scrolled past, and
- * pinned at 180° for any scroll beyond that. Transparent canvas, so
+ * 180° at the top of that space, unwinding to 0° once it's fully
+ * scrolled past, and pinned at 0° for any scroll beyond that. Transparent canvas, so
  * `.hero-bg-plain` (see globals.css) shows through behind it exactly
  * as it does behind the text it replaces.
  *
@@ -30,10 +30,7 @@ export function EmblemHero() {
     const scrollSpace = document.querySelector<HTMLElement>(
       ".emblem-scroll-space"
     );
-    const footerOverlay = document.querySelector<HTMLElement>(
-      ".hero-footer-overlay"
-    );
-    const scrollCue = document.querySelector<HTMLElement>(".scroll-cue");
+    const heroVideo = document.querySelector<HTMLVideoElement>(".hero-video");
 
     function scrollProgress() {
       if (!scrollSpace) return 0;
@@ -46,23 +43,27 @@ export function EmblemHero() {
       return clamp(window.scrollY, 0, total) / total;
     }
 
+    function progress() {
+      // When the hero backdrop is the scrubbed video, turn with *its*
+      // eased progress (HeroVideo.tsx publishes it) instead of raw
+      // scroll position. The playhead trails the scroll by design, and
+      // an emblem driven by scroll directly would finish its turn out
+      // of step with the clip. Until the video has published anything
+      // (still loading, or reduced motion), scroll drives the turn as
+      // it always did.
+      const scrub = heroVideo?.dataset.scrubProgress;
+      if (scrub !== undefined) {
+        const p = Number(scrub);
+        if (Number.isFinite(p)) return clamp(p, 0, 1);
+      }
+      return scrollProgress();
+    }
+
     let raf = 0;
     function tick() {
-      const progress = scrollProgress();
-      emblem.setRotation(progress * Math.PI); // 0 -> 180°, then holds
-
-      // Monogram overlay: starts fading in once the emblem is halfway
-      // turned (90°) and is fully in by the time it finishes (180°).
-      if (footerOverlay) {
-        footerOverlay.style.opacity = String(clamp(progress - 0.5, 0, 0.5) / 0.5);
-      }
-
-      // Scroll cue: gone within the first sliver of scrolling, well
-      // before the footer overlay above needs the same spot.
-      if (scrollCue) {
-        scrollCue.style.opacity = String(1 - clamp(progress / 0.08, 0, 1));
-      }
-
+      const p = progress();
+      emblem.setRotation((1 - p) * Math.PI); // 180° -> 0°: what used to be
+      // the end pose is now the resting one, unwinding as you scroll
       emblem.render();
       raf = requestAnimationFrame(tick);
     }

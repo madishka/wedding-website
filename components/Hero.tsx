@@ -30,10 +30,12 @@ function buildNav() {
  * `backdrop` picks what sits behind the full version:
  *   "image" — public/hero-sea.jpg with a slow scroll-linked zoom
  *   "video" — the caldera drone clip, scrubbed by scroll position
- *             (HeroVideo.tsx). This mode also renders a spacer after
- *             the pinned hero so the clip has scroll room to play out
- *             before the content sections curtain over it.
- * The public root ignores it — it never shows a photograph or the clip.
+ *             (HeroVideo.tsx). In the full version this also renders a
+ *             spacer after the pinned hero so the clip has scroll room
+ *             to play out before the content sections curtain over it.
+ *             On the public root the clip scrubs over the emblem's own
+ *             runway instead (.emblem-scroll-space, see app/page.tsx),
+ *             and nothing curtains over it.
  */
 export function Hero({
   showDetails = true,
@@ -43,13 +45,16 @@ export function Hero({
   backdrop?: HeroBackdrop;
 }) {
   const { couple, dateLabel, placeLabel } = siteConfig;
-  const useVideo = showDetails && backdrop === "video";
+  const useVideo = backdrop === "video";
   return (
     <>
     <section className="hero" id="top">
       <HeroMotion fadeContent={showDetails} />
       {useVideo ? (
-        <HeroVideo />
+        <HeroVideo
+          runwaySelector={showDetails ? ".hero-scroll-space" : ".emblem-scroll-space"}
+          curtain={showDetails}
+        />
       ) : (
         /*
           Backdrop: public/hero-sea.jpg (procedurally generated abstract
@@ -105,9 +110,8 @@ export function Hero({
         )}
       </div>
 
-      {/* Fades in as the emblem finishes its turn (see EmblemHero.tsx) —
-          an overlay inside the pinned hero, not a section after it, so
-          the hero never scrolls away to reveal it. */}
+      {/* An overlay inside the pinned hero, not a section after it, so
+          the hero never scrolls away to reveal it. Always visible. */}
       {!showDetails && (
         <div className="hero-footer-overlay">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -122,43 +126,14 @@ export function Hero({
         </div>
       )}
 
-      {/* Nudges people to scroll — the emblem's turn is the only hint
-          otherwise that the page does anything. Fades out as soon as
-          scrolling starts (see EmblemHero.tsx), well before the
-          footer overlay above occupies the same spot. */}
-      {!showDetails && (
-        <div className="scroll-cue" aria-hidden="true">
-          <span className="scroll-cue-label">Scroll</span>
-          <svg
-            className="scroll-cue-chevrons"
-            width="22"
-            height="22"
-            viewBox="0 0 22 22"
-            fill="none"
-          >
-            <path
-              d="M2 2L11 9L20 2"
-              stroke="currentColor"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              opacity="0.5"
-            />
-            <path
-              d="M2 11L11 18L20 11"
-              stroke="currentColor"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </div>
-      )}
     </section>
     {/* Scroll runway for the video scrub (see HeroVideo.tsx). Empty on
         purpose: the hero above is sticky, so this just holds the page
-        open while the clip plays out. Height lives in globals.css. */}
-    {useVideo && <div className="hero-scroll-space" aria-hidden="true" />}
+        open while the clip plays out. Height lives in globals.css. The
+        public root brings its own runway (.emblem-scroll-space). */}
+    {useVideo && showDetails && (
+      <div className="hero-scroll-space" aria-hidden="true" />
+    )}
     </>
   );
 }

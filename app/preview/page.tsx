@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { PasswordGate } from "@/components/PasswordGate";
 import { PreviewSite } from "@/components/PreviewSite";
 
-/** Dev-only. See components/PreviewSite.tsx. Same as /preview-image. */
+/** Dev-only. See components/PreviewSite.tsx. */
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
   title: "Madelaine & Philip",
@@ -23,5 +23,5 @@ export default async function PreviewPage({
   // household it would be unlocking.
   if ("gate" in (await searchParams)) return <PasswordGate />;
 
-  return <PreviewSite heroBackdrop="image" />;
+  return <PreviewSite />;
 }
