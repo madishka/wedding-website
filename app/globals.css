@@ -490,7 +490,10 @@ body::after {
   position: absolute;
   inset: 0;
   z-index: 0;
-  overflow: clip;
+  /* No overflow clip: during the entrance cross-dissolve the sticky
+     layer is offset upward past the wrapper's top edge so the incoming
+     scene covers the whole viewport while it fades in over the hero
+     (SectionVideo.tsx). Clipping would cut that off at the wrapper. */
 }
 
 .mid-backdrop-sticky {
@@ -506,6 +509,12 @@ body::after {
   height: 100%;
   object-fit: cover;
   pointer-events: none;
+}
+
+/* The entrance cross-dissolve (SectionVideo.tsx drives opacity and the
+   viewport-aligning offset). */
+.mid-backdrop-sticky {
+  will-change: opacity, transform;
 }
 
 /* Heavy grade over the light footage: it should read as texture behind
@@ -524,11 +533,15 @@ body::after {
 }
 
 /* Inside the wrapper the sections give up their solid backgrounds so
-   the clip shows through; their cards frost over it instead. Without
-   the wrapper (the token page, for now) they keep their solid tones. */
+   the clip shows through; their cards frost over it instead. */
 .mid .weekend,
 .mid .travel {
   background: transparent;
+}
+
+/* The old hard curtain-edge shadow fights the feathered dissolve. */
+.mid .weekend {
+  box-shadow: none;
 }
 
 .mid .event-card {

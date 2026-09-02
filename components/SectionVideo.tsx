@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useVideoScrub } from "./useVideoScrub";
 
 function clamp(value: number, min: number, max: number) {
@@ -101,7 +101,48 @@ export function SectionVideo({
   config?: MidVideoConfig;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const stickyRef = useRef<HTMLDivElement>(null);
   const { curve, curveMix = 1, ease, frameDuration } = config;
+
+  // The entrance: a pure cross-dissolve. During entry the sticky
+  // backdrop is translated up by exactly the wrapper's remaining
+  // offset, so the incoming scene covers the FULL viewport from the
+  // first pixel — there is no traveling edge at all — and only its
+  // opacity changes, fading the Oia scene in over the still-pinned,
+  // still-scrubbing hero (names included) while the cards scroll up
+  // through the blend. Smoothstepped so the fade eases in and lands
+  // softly at the pin. Scroll-linked directly (no easing): it must
+  // track the finger exactly. Inert under reduced motion and after
+  // entry (e = 1 → opacity 1, no offset).
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const sticky = stickyRef.current;
+    const wrap = sticky?.closest<HTMLElement>(".mid");
+    if (!sticky || !wrap) return;
+
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const rect = wrap.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const e = clamp(1 - rect.top / vh, 0, 1);
+      const t = e * e * (3 - 2 * e); // smoothstep
+      sticky.style.opacity = String(t);
+      sticky.style.transform = `translate3d(0, ${-Math.max(rect.top, 0)}px, 0)`;
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    update();
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
 
   const targetProgress = useCallback(() => {
     const wrap = videoRef.current?.closest<HTMLElement>(".mid");
@@ -122,7 +163,7 @@ export function SectionVideo({
 
   return (
     <div className="mid-backdrop" aria-hidden="true">
-      <div className="mid-backdrop-sticky">
+      <div className="mid-backdrop-sticky" ref={stickyRef}>
         <video
           ref={videoRef}
           muted
