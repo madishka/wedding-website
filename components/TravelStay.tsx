@@ -56,14 +56,19 @@ export function TravelStay() {
           <p className="eyebrow center">Travel &amp; stay</p>
           <h2 className="section-title center">Getting to Santorini</h2>
         </Reveal>
+        {/* Same cards as the weekend section — one card language for
+            everything that sits on the scrubbed footage, and the grid
+            stretches all three to equal height. */}
         {gettingThere && (
-        <div className="travel-grid">
+        <div className="event-grid">
           {GETTING_THERE.map((block, i) => (
             <Reveal key={block.title} delay={i * 90}>
-              <article className="travel-block">
+              <article className="event-card">
                 <h3>{block.title}</h3>
-                <p>{block.body}</p>
-                {block.note && <p className="travel-note">{block.note}</p>}
+                <p className="event-body">{block.body}</p>
+                {block.note && (
+                  <p className="event-body travel-note">{block.note}</p>
+                )}
               </article>
             </Reveal>
           ))}

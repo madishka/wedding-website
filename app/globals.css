@@ -542,6 +542,43 @@ body::after {
   background: rgba(11, 17, 23, 0.62);
 }
 
+/* Section headings sit directly on the footage — lift them off the
+   busy backdrop with the hero's text-shadow trick. */
+.mid .travel .eyebrow,
+.mid .travel .section-title,
+.mid .weekend .eyebrow,
+.mid .weekend .section-title {
+  text-shadow: 0 2px 26px rgba(8, 13, 18, 0.55), 0 1px 8px rgba(8, 13, 18, 0.4);
+}
+
+/* Plain text, no card — just brightened and shadowed enough to hold
+   its own over the footage. */
+.mid .stay-note {
+  color: #b6bfc7;
+  text-shadow: 0 1px 10px rgba(8, 13, 18, 0.55);
+}
+
+/* The wedding card: same dark frosted family as its siblings — the
+   solid off-white slab jarred against the footage — highlighted
+   instead by a brighter glassy fill, a luminous border and deeper
+   blur. Its text goes back to light (the global featured rules assume
+   the light slab). */
+.mid .event-card.featured {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.6);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  color: var(--ink);
+}
+
+.mid .event-card.featured .event-date {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.mid .event-card.featured .event-body {
+  color: rgba(255, 255, 255, 0.82);
+}
+
 /* The bands still alternate, just in depths of night instead of
    paper/stone — darkening toward the footer, which lands on the same
    tone the public root's gradient bottoms out at. */
@@ -647,33 +684,9 @@ body::after {
   padding: clamp(5rem, 10vw, 8rem) 0;
 }
 
-.travel-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2.4rem 3rem;
-  margin-top: 3.2rem;
-}
-
-.travel-block {
-  border-top: 1px solid var(--ink);
-  padding-top: 1.4rem;
-}
-
-.travel-block h3 {
-  font-family: var(--font-display), serif;
-  font-weight: 400;
-  font-size: 1.25rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.travel-block p {
-  margin-top: 0.8rem;
-  font-size: 0.88rem;
-  line-height: 1.75;
-  color: var(--muted);
-}
-
+/* The "getting there" blocks are plain .event-card now — one card
+   style for everything on the footage. Only the emphasized note keeps
+   its own color. */
 .travel-note {
   font-weight: 400;
   color: var(--ink-2) !important;
@@ -1289,7 +1302,6 @@ body::after {
   }
 
   .event-grid,
-  .travel-grid,
   .hotel-grid {
     grid-template-columns: 1fr;
   }
