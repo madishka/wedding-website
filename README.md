@@ -67,6 +67,66 @@ security — it is server-only and must never reach the browser.
 > that will bite you. Add a weekly cron ping, or go Pro for the months
 > around your reply-by date.
 
+## Setting up a second machine
+
+Everything below assumes you already have the repo. The one thing that is
+*not* in it is `.env.local` — it is gitignored, because it holds the service
+role key.
+
+**Get your own key; don't have it sent to you.** The service role key
+bypasses row level security, so it is full read/write over every guest,
+address and RSVP. Pasting it into WhatsApp or email puts it somewhere it
+cannot be taken back from. Instead, get added to the Supabase project and
+copy it from the dashboard yourself:
+
+1. The project owner: Supabase → **Organization settings → Team → Invite**,
+   using your email.
+2. Accept the invite, open the project → **Project Settings → API**.
+3. Copy the **Project URL** and the **`service_role`** key — click *Reveal*.
+   Not the `anon` key: RLS is on with no policies, so `anon` reads nothing
+   and fails in confusing silence.
+
+Then:
+
+```bash
+nvm install 22        # or any Node >= 22; .nvmrc pins it
+npm install
+cp .env.local.example .env.local   # then paste the two values in
+npm run check                      # read-only: proves the connection works
+npm run dev
+```
+
+`npm run check` walks the same path the app does — env, connection, schema,
+seed data — and names the exact step that is incomplete. If it is all green
+you are done.
+
+Leave `SITE_URL` as `http://localhost:3000` locally. It is only used to build
+the links written into `scripts/out/`, and nothing else reads it.
+
+### ⚠️ There is only one database, and it is the real one
+
+There is no staging project. Your local `npm run dev` reads the live guest
+list, and these scripts **write** to it from your laptop:
+
+| Command | |
+| --- | --- |
+| `npm run dev` / `build` | reads — safe |
+| `npm run check` | reads — safe |
+| `npm test` | pure logic, no database at all |
+| `npm run import:guests` | **writes** — creates/updates households and guests |
+| `npm run password` | **writes** — sets passwords, logs guests out |
+| `npm run seed:events` | **writes** — overwrites the events table |
+
+If you are working on the front end, you only ever need the first three.
+Before running anything in the second group, check with whoever owns the
+guest list — `npm run password -- --all` in particular can only be done
+once per household, since the plaintext is written out exactly once.
+
+To experiment freely, make your own Supabase project, run
+`supabase/schema.sql` in it, point your `.env.local` at that, and import the
+sample from `scripts/guests.template.csv`. Then nothing you do can touch the
+real invitations.
+
 ## The guest list
 
 The list lives in a spreadsheet, not in code. **One row per person**, with a
