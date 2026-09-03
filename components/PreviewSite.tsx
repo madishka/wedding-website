@@ -1,5 +1,5 @@
 import { Hero, type HeroBackdrop } from "@/components/Hero";
-import { SectionVideo } from "@/components/SectionVideo";
+import { SectionVideo, FIN_VIDEO_CONFIG } from "@/components/SectionVideo";
 import { SoftRsvp } from "@/components/SoftRsvp";
 import { TravelStay } from "@/components/TravelStay";
 import { Reveal } from "@/components/Reveal";
@@ -165,6 +165,12 @@ export function PreviewSite({
         <TravelStay />
         </div>
 
+        {/* The finale: the RSVP reply card over its own pinned,
+            scrubbed backdrop (the daylight terrace clip), entering
+            with the same cross-dissolve as the mid block. */}
+        <div className="fin">
+        <SectionVideo config={FIN_VIDEO_CONFIG} wrapperSelector=".fin" />
+
         <SoftRsvp
           guestNames={householdGreeting(party.guests, party.displayName)}
           initialResponse={party.softResponse}
@@ -173,6 +179,7 @@ export function PreviewSite({
           replyBy={replyBy}
           emblem
         />
+        </div>
       </main>
 
       <footer className="footer">

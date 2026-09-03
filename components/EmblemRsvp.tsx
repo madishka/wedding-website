@@ -11,18 +11,17 @@ function clamp(value: number, min: number, max: number) {
 }
 
 /**
- * The emblem again, smaller, above "Kindly reply by" in the RSVP
- * section — the same 0° → 180° turn as the public root's hero, driven
- * by how far the RSVP section has scrolled into view:
+ * The emblem as the reply card's crest — the same 0° → 180° turn as
+ * the public root's hero, driven by how far the RSVP section has
+ * scrolled into view:
  *
  *   0    the section's top edge enters at the bottom of the viewport
- *   1    its bottom edge has come up to the bottom of the viewport,
- *        i.e. the reader has reached the bottom of the section
+ *   1    the section has (nearly) finished arriving — the turn is done
+ *        by the time the form is in front of the reader, so the crest
+ *        rests face-on exactly where people pause to fill things in
  *
- * It fades in over the first part of that turn instead of being there
- * from the start (there is no dark hero to hide it in here — it would
- * just be sitting on white). Both stop at 1 and hold, so scrolling on
- * to the footer changes nothing.
+ * It fades in over the first part of the turn. Both stop at 1 and
+ * hold, so scrolling on to the footer changes nothing.
  *
  * Renders only when scroll or resize actually changes something, not
  * on a permanent rAF loop like the hero: this one sits on a page with
@@ -47,7 +46,13 @@ export function EmblemRsvp() {
         wrap.style.opacity = "1";
       } else {
         const rect = section.getBoundingClientRect();
-        const p = clamp((window.innerHeight - rect.top) / rect.height, 0, 1);
+        // Complete over ~85% of one viewport of entry, not the whole
+        // section height — done as the card settles in front of you.
+        const p = clamp(
+          (window.innerHeight - rect.top) / (window.innerHeight * 0.85),
+          0,
+          1
+        );
         emblem.setRotation(p * Math.PI);
         wrap.style.opacity = String(clamp(p / FADE_PORTION, 0, 1));
       }

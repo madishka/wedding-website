@@ -7,7 +7,11 @@ import { siteConfig } from "@/lib/site-config";
 type Status = "idle" | "submitting" | "done" | "error";
 
 /**
- * Wave one: the soft save-the-date reply.
+ * Wave one: the soft save-the-date reply, as a single frosted REPLY
+ * CARD floating over the finale backdrop (the terrace clip — see the
+ * .fin wrapper and SectionVideo.tsx). Everything lives on the card:
+ * the emblem as a small crest, the personalized welcome by name, the
+ * reply-by deadline, and the form.
  *
  * Household-level and deliberately non-binding — "we plan to be there"
  * or "we definitely can't". The per-guest, per-event RSVP with meals
@@ -38,8 +42,8 @@ export function SoftRsvp({
   initialNote: string | null;
   replyBy: { month: string; day: string; year: string };
   /**
-   * Show the turning emblem in the card's left column (EmblemRsvp.tsx).
-   * On for both the previews and the token page.
+   * Show the turning emblem as the card's crest (EmblemRsvp.tsx).
+   * On for both the preview and the token page.
    */
   emblem?: boolean;
 }) {
@@ -82,10 +86,8 @@ export function SoftRsvp({
     return (
       <section className="rsvp" id="rsvp">
         <div className="container">
-          <div className="rsvp-success">
-            <h3 className="rsvp-title">
-              Thank you
-            </h3>
+          <div className="rsvp-card rsvp-success">
+            <h3 className="rsvp-title">Thank you</h3>
             <p>
               {response === "yes"
                 ? "That's all we need for now — go ahead and hold the dates. We'll be in touch with the full details, and you'll reply properly then."
@@ -103,22 +105,19 @@ export function SoftRsvp({
 
   return (
     <section className="rsvp" id="rsvp">
-      <div className="container rsvp-grid">
-        {/* Left column: the welcome note, folded into the RSVP card —
-            greeting by name, the message, the reply-by date, and the
-            don't-share housekeeping, all in one place. */}
-        <div className="rsvp-copy">
+      <div className="container">
+        <div className="rsvp-card">
           {emblem && <EmblemRsvp />}
           <p className="eyebrow">{siteConfig.welcomeNote.eyebrow}</p>
-          <h2 className="rsvp-title">{siteConfig.welcomeNote.title}</h2>
-          <p className="rsvp-greeting">
+          <h2 className="rsvp-title">
             {siteConfig.welcomeNote.greeting} {guestNames},
-          </p>
+          </h2>
           {siteConfig.welcomeNote.paragraphs.map((text, i) => (
             <p key={i} className="rsvp-note">
               {text}
             </p>
           ))}
+
           <p className="rsvp-reply-label">Kindly reply by</p>
           <p className="rsvp-date">
             <span>{replyBy.month}</span>
@@ -127,82 +126,88 @@ export function SoftRsvp({
             <span className="bar" aria-hidden="true" />
             <span>{replyBy.year}</span>
           </p>
+
+          <form onSubmit={onSubmit}>
+            <fieldset className="field">
+              <legend>Can {guestNames} come?</legend>
+              <div className="option-stack" role="radiogroup">
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={response === "yes"}
+                  className={`option ${response === "yes" ? "selected" : ""}`}
+                  onClick={() => setResponse("yes")}
+                >
+                  <span>We&apos;re planning to be there</span>
+                  <span className="option-emoji" aria-hidden="true">
+                    {response === "yes" ? "😍" : ""}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={response === "no"}
+                  className={`option ${response === "no" ? "selected" : ""}`}
+                  onClick={() => setResponse("no")}
+                >
+                  <span>Sadly, we can&apos;t make it</span>
+                  <span className="option-emoji" aria-hidden="true">
+                    {response === "no" ? "💔" : ""}
+                  </span>
+                </button>
+              </div>
+            </fieldset>
+
+            <div className="field">
+              <label htmlFor="email">
+                Best email for the household*
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+              />
+              <p className="fine-print">
+                This is where the full invitation will go.
+              </p>
+            </div>
+
+            <div className="field">
+              <label htmlFor="note">Anything we should know? (optional)</label>
+              <textarea
+                id="note"
+                name="note"
+                rows={2}
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+              />
+            </div>
+
+            {error && <p className="form-error">{error}</p>}
+
+            <button
+              className="submit"
+              type="submit"
+              disabled={!response || status === "submitting"}
+            >
+              {status === "submitting"
+                ? "Sending…"
+                : alreadyReplied
+                  ? "Update our answer"
+                  : "Send"}
+            </button>
+          </form>
+
           <p className="rsvp-aside">
             Every invite is personal. Please do not share your invite link
             with others.
           </p>
         </div>
-
-        {/* Right column: the form itself, a single stack of fields. */}
-        <form onSubmit={onSubmit}>
-          <fieldset className="field">
-            <legend>Can {guestNames} come?</legend>
-            <div className="option-stack" role="radiogroup">
-              <button
-                type="button"
-                role="radio"
-                aria-checked={response === "yes"}
-                className={`option ${response === "yes" ? "selected" : ""}`}
-                onClick={() => setResponse("yes")}
-              >
-                We&apos;re planning to be there
-              </button>
-              <button
-                type="button"
-                role="radio"
-                aria-checked={response === "no"}
-                className={`option ${response === "no" ? "selected" : ""}`}
-                onClick={() => setResponse("no")}
-              >
-                Sadly, we can&apos;t make it
-              </button>
-            </div>
-          </fieldset>
-
-          <div className="field">
-            <label htmlFor="email">
-              Best email for the household*
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-            />
-            <p className="fine-print">
-              This is where the full invitation will go.
-            </p>
-          </div>
-
-          <div className="field">
-            <label htmlFor="note">Anything we should know? (optional)</label>
-            <textarea
-              id="note"
-              name="note"
-              rows={3}
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-            />
-          </div>
-
-          {error && <p className="form-error">{error}</p>}
-
-          <button
-            className="submit"
-            type="submit"
-            disabled={!response || status === "submitting"}
-          >
-            {status === "submitting"
-              ? "Sending…"
-              : alreadyReplied
-                ? "Update our answer"
-                : "Send"}
-          </button>
-        </form>
       </div>
     </section>
   );

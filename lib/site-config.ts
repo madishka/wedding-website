@@ -105,13 +105,11 @@ export const siteConfig = {
    */
   welcomeNote: {
     eyebrow: "A note from us",
-    title: "We're so glad you're here",
-    /** Precedes the names: "Dear Eric, Rebecca and Mia," */
+    /** Precedes the names: "Dear Eric, Rebecca and Mia," — the
+     *  personalized greeting is the card's title. */
     greeting: "Dear",
     paragraphs: [
-      "We're getting married in Santorini on 24 July 2027, and we would love to celebrate with you.",
-      "You'll find some early details below. Nothing is final yet and there's nothing to book — the full information comes this autumn.",
-      "For now, please reply below so we can get a sense of numbers.",
+      "We would love to celebrate with you! Please reply so we can get an early sense for the numbers.",
     ],
   },
 };

@@ -788,26 +788,68 @@ body::after {
 .rsvp {
   background: #10171f;
   padding: clamp(5rem, 10vw, 8.5rem) 0;
+  /* the oversized background emblem must not create sideways scroll */
+  overflow: clip;
 }
 
-.rsvp-grid {
-  display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  gap: clamp(3rem, 7vw, 6.5rem);
-  align-items: start;
+/* ——— the finale wrapper: RSVP over its own scrubbed backdrop ——— */
+
+/* z-index makes .fin a stacking context, so during the entrance
+   cross-dissolve its viewport-aligned backdrop paints over the WHOLE
+   outgoing scene — the mid section's cards included — exactly like the
+   hero→mid dissolve, instead of sliding in beneath them. Deliberately
+   NO background: the outgoing Oia backdrop is held viewport-pinned
+   through its exit (SectionVideo's exitOffset), so it is the layer the
+   dissolve happens over everywhere — an opaque base here would draw a
+   traveling seam across it. */
+.fin {
+  position: relative;
+  z-index: 1;
 }
 
-/* The emblem, turning as the section scrolls in (EmblemRsvp.tsx). Sits
-   above "Kindly reply by" in the left column, pushing the title down.
-   Smaller than the hero's, and starts invisible — the component fades
-   it in as the turn begins. */
+.fin .rsvp {
+  background: transparent;
+}
+
+/* Daylight footage needs a heavier grade than the Oia dusk. The
+   bottom fades to the footer's tone so the page lands seamlessly. */
+.fin .mid-video-scrim {
+  background: linear-gradient(
+    to bottom,
+    rgba(13, 19, 26, 0.8),
+    rgba(13, 19, 26, 0.74) 60%,
+    #0b1117 100%
+  );
+}
+
+/* The reply card: one frosted surface over the terrace clip, holding
+   the crest, the greeting by name, the deadline and the form. The
+   form re-left-aligns its own innards for scannability. */
+.rsvp-card {
+  max-width: 36rem;
+  margin-inline: auto;
+  padding: clamp(1.8rem, 3.5vw, 2.5rem) clamp(1.5rem, 4vw, 3rem);
+  text-align: center;
+  background: rgba(11, 17, 23, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 2px;
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+.rsvp-card form {
+  margin-top: 1.8rem;
+  text-align: left;
+}
+
+/* The emblem crest at the head of the card, turning with scroll
+   (EmblemRsvp.tsx) — big enough to read, and its rotation completes
+   as the card finishes arriving, so it rests face-on while the form
+   is being filled in. */
 .rsvp-emblem {
-  width: min(48vw, 200px);
+  width: 128px;
   aspect-ratio: 1 / 1;
-  margin: -1.5rem 0 1.6rem -1.25rem; /* the model sits in a square with
-                                        air around it; pull that air back
-                                        so the mark itself lines up with
-                                        the title's left edge and top */
+  margin: -0.8rem auto 0.4rem;
   opacity: 0;
   will-change: opacity;
 }
@@ -818,28 +860,22 @@ body::after {
   display: block;
 }
 
-/* Sized for the longer merged title ("We're so glad you're here"), not
-   the old two-word "Kindly reply by". */
+/* "Dear Carly and Brandon," — the personalized welcome IS the title.
+   Sized to stay one line on desktop, header-sized rather than hero. */
 .rsvp-title {
   font-family: var(--font-display), serif;
   font-weight: 400;
-  font-size: clamp(2.1rem, 3.6vw, 3rem);
-  line-height: 1.08;
-  letter-spacing: 0.06em;
+  font-size: clamp(1.45rem, 2.4vw, 1.9rem);
+  line-height: 1.2;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  margin-top: 0.9rem;
-}
-
-/* "Dear Carly and Brandon," — the opening line of a letter. */
-.rsvp-greeting {
-  margin-top: 1.8rem;
-  line-height: 1.75;
+  margin-top: 0.7rem;
 }
 
 /* Small-caps lead-in to the date block, doing the work the old giant
    "Kindly reply by" title used to. */
 .rsvp-reply-label {
-  margin-top: 2.2rem;
+  margin-top: 1.6rem;
   font-size: 0.7rem;
   font-weight: 400;
   letter-spacing: 0.35em;
@@ -847,20 +883,22 @@ body::after {
   color: var(--muted);
 }
 
-/* The don't-share housekeeping, set apart like the old welcome aside. */
+/* The don't-share housekeeping, set apart under the form. */
 .rsvp-aside {
-  max-width: 24rem;
-  margin-top: 2.4rem;
-  padding-top: 1.6rem;
+  max-width: 26rem;
+  margin-top: 1.6rem;
+  margin-inline: auto;
+  padding-top: 1.1rem;
   border-top: 1px solid var(--line);
-  font-size: 0.82rem;
-  line-height: 1.7;
+  font-size: 0.78rem;
+  line-height: 1.6;
   color: var(--muted);
 }
 
 .rsvp-date {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 1rem;
   margin-top: 0.9rem;
   font-size: 0.78rem;
@@ -883,9 +921,10 @@ body::after {
 }
 
 .rsvp-note {
-  margin-top: 1.4rem;
-  max-width: 24rem;
-  font-size: 0.88rem;
+  margin-top: 1rem;
+  margin-inline: auto;
+  max-width: 26rem;
+  font-size: 0.92rem;
   color: var(--muted);
 }
 
@@ -935,13 +974,19 @@ body::after {
   gap: 0.55rem;
 }
 
+/* Unambiguously buttons: visible border, hover response, and once
+   picked, an inverted fill plus an emoji stamp (set in SoftRsvp.tsx). */
 .option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
   font: inherit;
   font-weight: 400;
   font-size: 0.92rem;
   text-align: left;
-  padding: 0.75rem 1rem;
-  border: 1px solid transparent;
+  padding: 0.8rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.32);
   border-radius: 3px;
   background: var(--field);
   color: var(--ink);
@@ -950,12 +995,22 @@ body::after {
 }
 
 .option:hover {
-  border-color: var(--ink);
+  border-color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.13);
+  transform: translateY(-1px);
 }
 
 .option.selected {
   background: var(--ink);
+  border-color: var(--ink);
   color: var(--white);
+}
+
+.option-emoji {
+  min-width: 1.3em;
+  font-size: 1.05rem;
+  line-height: 1;
+  text-align: right;
 }
 
 .submit {
@@ -998,11 +1053,9 @@ body::after {
   color: #e59a90; /* readable red on the dark card */
 }
 
+/* Rendered inside .rsvp-card, which supplies the chrome. */
 .rsvp-success {
-  padding: 3rem 1rem;
   text-align: center;
-  border: 1px solid var(--line);
-  border-radius: 2px;
 }
 
 .rsvp-success h3 {
@@ -1292,28 +1345,6 @@ body::after {
 }
 
 @media (max-width: 900px) {
-  .rsvp-grid {
-    grid-template-columns: 1fr;
-    gap: 3rem;
-  }
-
-  .rsvp-copy {
-    text-align: center;
-  }
-
-  .rsvp-emblem {
-    margin-inline: auto;
-  }
-
-  .rsvp-date {
-    justify-content: center;
-  }
-
-  .rsvp-note,
-  .rsvp-aside {
-    margin-inline: auto;
-  }
-
   .event-grid,
   .hotel-grid {
     grid-template-columns: 1fr;
