@@ -123,7 +123,7 @@ export function SoftRsvp({
             </p>
           ))}
 
-          <p className="rsvp-reply-label">Kindly reply by</p>
+          <p className="rsvp-reply-label">Kindly respond by</p>
           <p className="rsvp-date">
             <span>{replyBy.month}</span>
             <span className="bar" aria-hidden="true" />

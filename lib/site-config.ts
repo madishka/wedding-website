@@ -52,18 +52,21 @@ export const siteConfig = {
    */
   weekendOutline: [
     {
+      dayLabel: "Friday",
       dateLabel: "July 23",
       name: "The evening before",
       body: "We're planning something to open the weekend. Details to come with the full invitation.",
       tbd: true,
     },
     {
+      dayLabel: "Saturday",
       dateLabel: "July 24",
       name: "The wedding",
       body: "A clifftop ceremony overlooking the caldera, followed by dinner and dancing.",
       tbd: false,
     },
     {
+      dayLabel: "Sunday",
       dateLabel: "July 25",
       name: "The morning after",
       body: "A slow send-off before everyone scatters. Details to come.",
@@ -94,7 +97,7 @@ export const siteConfig = {
   dateLabel: "July 24, 2027",
   placeLabel: "Santorini, Greece",
   /** RSVP deadline shown in the "Kindly reply by" block. */
-  replyBy: { month: "October", day: "1", year: "2026" },
+  replyBy: { month: "November", day: "1", year: "2026" },
 
   /**
    * The note from us. No longer its own section — it opens the RSVP

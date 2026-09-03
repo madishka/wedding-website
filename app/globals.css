@@ -659,6 +659,22 @@ body::after {
   background: var(--white);
 }
 
+/* The weekday, above the date. Larger and darker than the date beneath it —
+   "Friday" is what someone scans for when working out which nights they
+   need a hotel, so it leads and the date confirms it. */
+.event-day {
+  font-family: var(--font-display), serif;
+  font-size: 1.35rem;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  /* Inherit rather than naming a token: the sections over the video
+     redefine --ink and --white for their own dark treatment, so a
+     hardcoded colour here comes out backwards on the featured card. The
+     card already carries the right colour for its own variant. */
+  color: inherit;
+  margin-bottom: 0.15rem;
+}
+
 .event-date {
   font-size: 0.68rem;
   letter-spacing: 0.36em;

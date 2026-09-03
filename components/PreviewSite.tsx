@@ -124,6 +124,7 @@ export function PreviewSite({
                     <article
                       className={`event-card ${day.tbd ? "" : "featured"}`}
                     >
+                      <p className="event-day">{day.dayLabel}</p>
                       <p className="event-date">{day.dateLabel}</p>
                       <h3>{day.name}</h3>
                       <p className="event-body">{day.body}</p>
