@@ -24,7 +24,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 
 import path from "node:path";
 import { normalizeKey } from "./lib/import-utils.mjs";
-import { hashPassword } from "./lib/password-utils.mjs";
+import { hashPassword, verifyPassword } from "./lib/password-utils.mjs";
 
 /**
  * Passwords are <first names, joined><year> — "maddiephilip2027", "jack2027".
@@ -218,6 +218,25 @@ if (CLEAR) {
 }
 
 const password = passwordArg || generatePassword(match);
+
+// Generated passwords are derived from the household's names, so they are
+// the same every time. Asking for a "reset" without naming a new one would
+// therefore write back the password they already have — logging every
+// unlocked device out to achieve precisely nothing. Almost certainly not
+// what you meant, so stop and say so.
+if (!passwordArg && verifyPassword(password, match.password_hash)) {
+  fail(
+    `${match.display_name} already has that password.\n\n` +
+      `Generated passwords come from the guests' names, so re-generating\n` +
+      `gives you "${password}" again — same password, but everyone already\n` +
+      `logged in gets logged out.\n\n` +
+      `To actually change it, give the new one:\n` +
+      `  npm run password -- "${match.display_name}" theirnewpassword\n\n` +
+      `To remove it entirely:\n` +
+      `  npm run password -- --clear "${match.display_name}"`
+  );
+}
+
 await write(match, password);
 
 console.log(`\n  ✓ ${match.display_name}`);

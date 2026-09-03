@@ -221,7 +221,20 @@ npm run password -- --all                         # generate for everyone
 ```
 
 Partial names work — `npm run password -- chen` finds the Chens, and says
-so if it matches more than one household.
+so if it matches more than one household. Match on how the household is
+actually named in the database (`--list` shows you); "Maddie & Philip"
+will not find a household stored as "Philip & Maddie", though `maddie`
+finds it either way.
+
+**To change a password you must name the new one.** Generated passwords
+come from the guests' names, so re-generating produces the same password
+again — which would log every unlocked device out and change nothing. The
+script refuses that rather than letting it look like a reset:
+
+```bash
+npm run password -- "Philip & Maddie" somethingelse   # actually changes it
+npm run password -- --clear "Philip & Maddie"         # removes it entirely
+```
 
 `--all` is the usual first move: it gives a password to every household
 that hasn't got one, and skips the ones that have — so re-running it after
