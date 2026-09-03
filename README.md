@@ -159,14 +159,14 @@ Three rules the importer enforces, so it's worth knowing them up front:
   rows beneath it blank is exactly right.
 - **The household name is never shown to guests.** It groups people onto a
   link and it is how re-imports match, nothing more. The site addresses
-  people by their own first names — the welcome note says "Dear Carly and
-  Brandon," and the RSVP asks "Can Carly and Brandon come?", both built from
+  people by their own first names — the welcome note says "Dear Nadia and
+  Theo," and the RSVP asks "Can Nadia and Theo come?", both built from
   the `Guest Name` column. So name households whatever helps *you* find them
   in the spreadsheet. This matters for couples who don't share a surname: a
-  household can be "Carly & Brandon" without putting Carly's surname on
-  Brandon anywhere.
+  household can be "Nadia & Theo" without putting Nadia's surname on
+  Theo anywhere.
 - **First name only is fine.** If you don't know a plus-one's surname, put
-  just "Brandon" in `Guest Name`. Leave it blank entirely and they appear as
+  just "Theo" in `Guest Name`. Leave it blank entirely and they appear as
   "and guest" instead.
 - **The household name is the identity for re-imports.** Editing the sheet
   updates in place, but changing a household's *name* creates a second
@@ -315,7 +315,7 @@ Generated passwords are **everyone's first names, joined, then the year**:
 | Maddie and Philip | `maddiephilip2027` |
 | Jack, on his own | `jack2027` |
 | Jack + a plus-one whose name we don't know | `jack2027` |
-| Carly Amsterdam and Brandon | `carlybrandon2027` |
+| Nadia Whitlock and Theo | `nadiatheo2027` |
 
 Unnamed plus-one slots are skipped, so a household with a nameless +1 gets
 the same password as if they had none. Accents and hyphens are folded —

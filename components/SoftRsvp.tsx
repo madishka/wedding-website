@@ -30,10 +30,10 @@ export function SoftRsvp({
   emblem = false,
 }: {
   /**
-   * The people, by first name — "Carly and Brandon" — not the household's
+   * The people, by first name — "Nadia and Theo" — not the household's
    * internal name. Those are not the same thing: a household called
-   * "Amsterdam Household" may well contain a Brandon who is not an
-   * Amsterdam, and asking "Can Amsterdam Household come?" would put a
+   * "Whitlock Household" may well contain a Theo who is not a
+   * Whitlock, and asking "Can Whitlock Household come?" would put a
    * surname on someone who doesn't have it.
    */
   guestNames: string;

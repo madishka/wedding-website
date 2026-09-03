@@ -27,15 +27,15 @@ const MOCK_PARTY: Party = {
   // two people do not share a surname, and a plus-one we only know the first
   // name of. The household's own name is internal, so it can be anything
   // that reads well on the links spreadsheet.
-  displayName: "Carly & Brandon",
+  displayName: "Nadia & Theo",
   contactEmail: "preview@example.com",
   softResponse: null,
   softNote: null,
   hasPassword: false,
   passwordSetAt: null,
   guests: [
-    { id: "g1", name: "Carly Amsterdam", guestType: "adult", sortOrder: 0 },
-    { id: "g2", name: "Brandon", guestType: "plus_one", sortOrder: 1 },
+    { id: "g1", name: "Nadia Whitlock", guestType: "adult", sortOrder: 0 },
+    { id: "g2", name: "Theo", guestType: "plus_one", sortOrder: 1 },
   ],
   events: [
     {

@@ -933,7 +933,7 @@ body::after {
   display: block;
 }
 
-/* "Dear Carly and Brandon," — the personalized welcome IS the title.
+/* "Dear Nadia and Theo," — the personalized welcome IS the title.
    Sized to stay one line on desktop, header-sized rather than hero. */
 .rsvp-title {
   font-family: var(--font-display), serif;
