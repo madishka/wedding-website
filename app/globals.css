@@ -586,15 +586,11 @@ body::after {
   box-shadow: none;
 }
 
-/* Tinted, not frosted: backdrop-filter over a backdrop that TRANSFORMS
-   every scroll frame (the scrubbing clip, the Ken Burns still) forces
-   the compositor to recompute the blur per card per frame — heavy
-   scroll jank on Chrome and mobile Safari, worst where the surface is
-   biggest. A deeper tint reads nearly the same over footage this dark
-   and costs nothing. */
 .mid .event-card {
-  background: rgba(13, 19, 26, 0.72);
+  background: rgba(11, 17, 23, 0.45);
   border-color: rgba(255, 255, 255, 0.18);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 
 /* WebKit won't render a backdrop-filter while an ancestor's opacity is
@@ -609,7 +605,7 @@ body::after {
 }
 
 .mid .event-card:not(.featured):hover {
-  background: rgba(13, 19, 26, 0.85);
+  background: rgba(11, 17, 23, 0.62);
 }
 
 /* Section headings sit directly on the footage — lift them off the
@@ -634,8 +630,10 @@ body::after {
    blur. Its text goes back to light (the global featured rules assume
    the light slab). */
 .mid .event-card.featured {
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.12);
   border-color: rgba(255, 255, 255, 0.6);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
   color: var(--ink);
 }
 
