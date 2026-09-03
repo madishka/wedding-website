@@ -22,7 +22,13 @@ export function SectionImage({
   src,
   wrapperSelector = ".mid",
 }: {
-  src: string;
+  /**
+   * Image URL for an inline background. Omit it and CSS supplies the
+   * picture instead — which is how the finale gets format negotiation
+   * (`.fin .mid-image` uses image-set for AVIF with a JPEG fallback,
+   * something an inline style can't express).
+   */
+  src?: string;
   /** The wrapper whose visible life is the dissolve range (.mid, .fin). */
   wrapperSelector?: string;
 }) {
@@ -70,7 +76,7 @@ export function SectionImage({
         <div
           className="mid-image"
           ref={imageRef}
-          style={{ backgroundImage: `url(${src})` }}
+          style={src ? { backgroundImage: `url(${src})` } : undefined}
         />
         <div className="mid-video-scrim" />
       </div>

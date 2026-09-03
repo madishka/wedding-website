@@ -116,7 +116,7 @@ export function Hero({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             className="monogram-img"
-            src="/monogram.png"
+            src="/monogram.webp"
             alt={`${couple.partnerA[0]} & ${couple.partnerB[0]} monogram`}
             width={640}
             height={441}

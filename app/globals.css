@@ -181,6 +181,11 @@ body::after {
   inset: 0;
   z-index: 0;
   background-image: var(--hero-scrim), url("/hero-sea.jpg");
+  background-image: var(--hero-scrim),
+    image-set(
+      url("/hero-sea.avif") type("image/avif"),
+      url("/hero-sea.jpg") type("image/jpeg")
+    );
   background-size: cover;
   background-position: center 62%;
   will-change: transform;
@@ -853,6 +858,17 @@ body::after {
   background-position: center 62%;
   transform: scale(1.04); /* matches the move's start, pre-hydration */
   will-change: transform;
+}
+
+/* The finale's picture, supplied here rather than inline so it can
+   format-negotiate: AVIF for browsers that take image-set(), the bare
+   JPEG line as the fallback. */
+.fin .mid-image {
+  background-image: url("/hero-sea.jpg");
+  background-image: image-set(
+    url("/hero-sea.avif") type("image/avif"),
+    url("/hero-sea.jpg") type("image/jpeg")
+  );
 }
 
 /* The reply card: one frosted surface over the terrace clip, holding

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useSceneDissolve } from "./useSceneDissolve";
 import { useVideoScrub } from "./useVideoScrub";
 
@@ -70,22 +70,6 @@ const DEFAULT_CONFIG: MidVideoConfig = {
   ease: 0.12,
 };
 
-/**
- * The finale backdrop, behind the RSVP reply card: the Imerovigli
- * terraces in daylight (santoriniW2), first 2s, 2x interpolated to
- * 60 fps. Its motion is uniform (measured), so no curve — just an
- * extra-floaty ease so the glide stays barely noticeable behind the
- * form.
- */
-export const FIN_VIDEO_CONFIG: MidVideoConfig = {
-  hevcSrc: "/fin-terrace-hevc.mp4",
-  hevcType: 'video/mp4; codecs="hvc1.1.6.L123.B0"',
-  h264Src: "/fin-terrace.mp4",
-  poster: "/fin-terrace-poster.jpg",
-  frameDuration: 1 / 59.94,
-  ease: 0.1,
-};
-
 /** Piecewise-linear lookup through the curve samples. */
 function applyCurve(curve: number[], progress: number) {
   const scaled = clamp(progress, 0, 1) * (curve.length - 1);
@@ -128,6 +112,33 @@ export function SectionVideo({
   // with SectionImage).
   useSceneDissolve(stickyRef, wrapperSelector);
 
+  // Lazy load: the clip sits below the fold, so don't spend megabytes
+  // on it up front. The element starts preload="none" (poster only);
+  // once the wrapper comes within a quarter-viewport of the screen,
+  // flip to auto and fetch — the scrub machinery just waits for
+  // loadedmetadata as usual. (A generous 100% margin defeated the
+  // point: the wrapper starts only ~1.5 viewports down, so the
+  // expanded viewport already reached it on load. 25% waits for real
+  // scroll intent and still gives the clip a scroll-runway's worth of
+  // headstart, with the poster covering any gap.)
+  useEffect(() => {
+    const video = videoRef.current;
+    const wrap = video?.closest<HTMLElement>(wrapperSelector);
+    if (!video || !wrap) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          video.preload = "auto";
+          video.load();
+          io.disconnect();
+        }
+      },
+      { rootMargin: "25% 0px" }
+    );
+    io.observe(wrap);
+    return () => io.disconnect();
+  }, [wrapperSelector]);
+
   const targetProgress = useCallback(() => {
     const wrap = videoRef.current?.closest<HTMLElement>(wrapperSelector);
     if (!wrap) return 0;
@@ -156,7 +167,7 @@ export function SectionVideo({
           ref={videoRef}
           muted
           playsInline
-          preload="auto"
+          preload="none"
           poster={config.poster}
           disablePictureInPicture
           disableRemotePlayback

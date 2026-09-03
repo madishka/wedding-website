@@ -1,6 +1,10 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 
+/* Meshopt-compressed (gltf-transform optimize --compress meshopt) —
+   a fraction of the original export's size. The decoder is pure JS
+   bundled with three, no external wasm files to host. */
 const MODEL_URL = "/soviet_canada_emblem.glb";
 
 export type EmblemScene = {
@@ -55,7 +59,9 @@ export function createEmblemScene(wrap: HTMLElement): EmblemScene {
   let loaded = false;
   const loadCallbacks: Array<() => void> = [];
 
-  new GLTFLoader().load(MODEL_URL, (gltf) => {
+  const loader = new GLTFLoader();
+  loader.setMeshoptDecoder(MeshoptDecoder);
+  loader.load(MODEL_URL, (gltf) => {
     if (disposed) return;
     const model = gltf.scene;
 

@@ -132,7 +132,7 @@ export default async function PartyPage({
             still (slow Ken Burns zoom), entering with the same
             cross-dissolve as the mid block. */}
         <div className="fin">
-        <SectionImage src="/hero-sea.jpg" wrapperSelector=".fin" />
+        <SectionImage wrapperSelector=".fin" />
 
         <SoftRsvp
           guestNames={householdGreeting(party.guests, party.displayName)}
@@ -150,7 +150,7 @@ export default async function PartyPage({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             className="monogram-img"
-            src="/monogram.png"
+            src="/monogram.webp"
             alt={`${couple.partnerA[0]} & ${couple.partnerB[0]} monogram`}
             width={640}
             height={441}
