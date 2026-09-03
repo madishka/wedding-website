@@ -106,9 +106,14 @@ export function SoftRsvp({
   return (
     <section className="rsvp" id="rsvp">
       <div className="container">
-        <div className="rsvp-card">
+        {/* Two columns on desktop, like the facing pages of an
+            invitation — the note on the left, the reply on the right —
+            so the card fits a screen instead of stacking two of them.
+            Collapses to one column on mobile. */}
+        <div className="rsvp-card rsvp-card--split">
+          <div className="rsvp-card-grid">
+          <div>
           {emblem && <EmblemRsvp />}
-          <p className="eyebrow">{siteConfig.welcomeNote.eyebrow}</p>
           <h2 className="rsvp-title">
             {siteConfig.welcomeNote.greeting} {guestNames},
           </h2>
@@ -126,7 +131,9 @@ export function SoftRsvp({
             <span className="bar" aria-hidden="true" />
             <span>{replyBy.year}</span>
           </p>
+          </div>
 
+          <div>
           <form onSubmit={onSubmit}>
             <fieldset className="field">
               <legend>Can {guestNames} come?</legend>
@@ -207,6 +214,8 @@ export function SoftRsvp({
             Every invite is personal. Please do not share your invite link
             with others.
           </p>
+          </div>
+          </div>
         </div>
       </div>
     </section>

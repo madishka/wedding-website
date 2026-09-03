@@ -104,7 +104,6 @@ export const siteConfig = {
    * lib/names.ts — so this is only the body around it.
    */
   welcomeNote: {
-    eyebrow: "A note from us",
     /** Precedes the names: "Dear Eric, Rebecca and Mia," — the
      *  personalized greeting is the card's title. */
     greeting: "Dear",

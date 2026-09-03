@@ -493,7 +493,11 @@ body::after {
   /* No overflow clip: during the entrance cross-dissolve the sticky
      layer is offset upward past the wrapper's top edge so the incoming
      scene covers the whole viewport while it fades in over the hero
-     (SectionVideo.tsx). Clipping would cut that off at the wrapper. */
+     (SectionVideo.tsx). Clipping would cut that off at the wrapper.
+     And no pointer events for the whole layer: the entry offset parks
+     it (invisibly, opacity 0) over the viewport before its scene
+     starts — without this it swallows clicks meant for the hero nav. */
+  pointer-events: none;
 }
 
 .mid-backdrop-sticky {
@@ -511,10 +515,16 @@ body::after {
   pointer-events: none;
 }
 
-/* The entrance cross-dissolve (SectionVideo.tsx drives opacity and the
-   viewport-aligning offset). */
+/* The entrance cross-dissolve (useSceneDissolve.ts drives opacity and
+   the viewport-aligning offset). overflow: clip contains anything
+   scaled inside — the still's Ken Burns zoom overflows its box by up
+   to ~5%, and unclipped that spill hangs below the document end,
+   visible in Safari's elastic bounce past the footer. (clip, not
+   hidden: hidden would make this a scroll container and break the
+   sticky descendants' geometry assumptions.) */
 .mid-backdrop-sticky {
   will-change: opacity, transform;
+  overflow: clip;
 }
 
 /* Heavy grade over the light footage: it should read as texture behind
@@ -549,6 +559,17 @@ body::after {
   border-color: rgba(255, 255, 255, 0.18);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
+}
+
+/* WebKit won't render a backdrop-filter while an ancestor's opacity is
+   animating — with the default Reveal (fade + rise) the frosted cards
+   appeared first and their blur popped in late. Inside the video
+   wrappers the reveal is therefore transform-only: cards slide up into
+   place already frosted. */
+.mid .reveal,
+.fin .reveal {
+  opacity: 1;
+  transition-property: transform;
 }
 
 .mid .event-card:not(.featured):hover {
@@ -811,15 +832,27 @@ body::after {
   background: transparent;
 }
 
-/* Daylight footage needs a heavier grade than the Oia dusk. The
-   bottom fades to the footer's tone so the page lands seamlessly. */
+/* The sea still is already dark — a lighter grade than the daylight
+   clip needed. The bottom fades to the footer's tone so the page
+   lands seamlessly. */
 .fin .mid-video-scrim {
   background: linear-gradient(
     to bottom,
-    rgba(13, 19, 26, 0.8),
-    rgba(13, 19, 26, 0.74) 60%,
+    rgba(13, 19, 26, 0.5),
+    rgba(13, 19, 26, 0.45) 60%,
     #0b1117 100%
   );
+}
+
+/* The still backdrop (SectionImage.tsx): cover-fit; the scroll-driven
+   Ken Burns transform is applied by the component. */
+.mid-image {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center 62%;
+  transform: scale(1.04); /* matches the move's start, pre-hydration */
+  will-change: transform;
 }
 
 /* The reply card: one frosted surface over the terrace clip, holding
@@ -842,14 +875,38 @@ body::after {
   text-align: left;
 }
 
-/* The emblem crest at the head of the card, turning with scroll
-   (EmblemRsvp.tsx) — big enough to read, and its rotation completes
-   as the card finishes arriving, so it rests face-on while the form
-   is being filled in. */
+/* The split card: two facing columns on desktop — the note left, the
+   reply right — so the whole thing fits a screen. One column again
+   below 900px, where the stacked height is what phones expect. */
+.rsvp-card--split {
+  max-width: 62rem;
+}
+
+.rsvp-card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2rem, 4vw, 3.5rem);
+  align-items: center;
+}
+
+.rsvp-card-grid form {
+  margin-top: 0;
+}
+
+@media (max-width: 900px) {
+  .rsvp-card-grid {
+    grid-template-columns: 1fr;
+    gap: 2.2rem;
+  }
+}
+
+/* The emblem crest at the head of the note, turning with scroll
+   (EmblemRsvp.tsx) — its rotation completes as the card finishes
+   arriving, so it rests face-on while the form is being filled in. */
 .rsvp-emblem {
-  width: 128px;
+  width: 224px;
   aspect-ratio: 1 / 1;
-  margin: -0.8rem auto 0.4rem;
+  margin: -1rem auto 0;
   opacity: 0;
   will-change: opacity;
 }
@@ -1075,6 +1132,10 @@ body::after {
 
 /* ——— footer ——— */
 
+/* Normal flow: the footer scrolls up OVER the finale's pinned video
+   (which holds the viewport to the very end via the bounded exit-pin
+   in SectionVideo.tsx), same as the reply card before it — and then
+   the page simply ends. */
 .footer {
   border-top: 1px solid var(--line);
   padding: clamp(3.5rem, 6vw, 5rem) 0 3rem;
@@ -1385,5 +1446,9 @@ body::after {
     animation: none;
     transform: none;
     width: 4.5rem;
+  }
+
+  .mid-image {
+    transform: none;
   }
 }

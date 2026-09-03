@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useRef } from "react";
+import { useSceneDissolve } from "./useSceneDissolve";
 import { useVideoScrub } from "./useVideoScrub";
 
 function clamp(value: number, min: number, max: number) {
@@ -123,53 +124,9 @@ export function SectionVideo({
   const stickyRef = useRef<HTMLDivElement>(null);
   const { curve, curveMix = 1, ease, frameDuration } = config;
 
-  // The entrance and exit: a pure cross-dissolve on both ends. During
-  // entry the sticky backdrop is translated up by exactly the
-  // wrapper's remaining offset, so the incoming scene covers the FULL
-  // viewport from the first pixel — there is no traveling edge at all
-  // — and only its opacity changes, fading in over the outgoing scene
-  // while the content scrolls up through the blend. Smoothstepped so
-  // the fade eases in and lands softly at the pin. Scroll-linked
-  // directly (no easing): it must track the finger exactly. Inert
-  // under reduced motion.
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const sticky = stickyRef.current;
-    const wrap = sticky?.closest<HTMLElement>(wrapperSelector);
-    if (!sticky || !wrap) return;
-
-    let raf = 0;
-    const update = () => {
-      raf = 0;
-      const rect = wrap.getBoundingClientRect();
-      const vh = window.innerHeight;
-      const e = clamp(1 - rect.top / vh, 0, 1);
-      const t = e * e * (3 - 2 * e); // smoothstep
-      sticky.style.opacity = String(t);
-      // Entry: hold the layer viewport-aligned before the pin, so the
-      // scene fades in covering the whole screen. Exit: hold it pinned
-      // while the wrapper's bottom passes (sticky would otherwise slide
-      // up with it), so the NEXT scene's dissolve happens over a
-      // stationary outgoing picture — the hero gets this for free by
-      // being sticky over the whole page; every later scene needs it
-      // done by hand. The two offsets are never nonzero at once.
-      const entryOffset = -Math.max(rect.top, 0);
-      const exitOffset = Math.max(vh - rect.bottom, 0);
-      sticky.style.transform = `translate3d(0, ${entryOffset + exitOffset}px, 0)`;
-    };
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(update);
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll, { passive: true });
-    update();
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, [wrapperSelector]);
+  // The entrance/exit cross-dissolve — see useSceneDissolve.ts (shared
+  // with SectionImage).
+  useSceneDissolve(stickyRef, wrapperSelector);
 
   const targetProgress = useCallback(() => {
     const wrap = videoRef.current?.closest<HTMLElement>(wrapperSelector);
