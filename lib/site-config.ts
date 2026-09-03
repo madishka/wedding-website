@@ -97,7 +97,7 @@ export const siteConfig = {
   dateLabel: "July 24, 2027",
   placeLabel: "Santorini, Greece",
   /** RSVP deadline shown in the "Kindly reply by" block. */
-  replyBy: { month: "November", day: "1", year: "2026" },
+  replyBy: { month: "October", day: "1", year: "2026" },
 
   /**
    * The note from us. No longer its own section — it opens the RSVP

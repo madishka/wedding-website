@@ -27,7 +27,7 @@ export type EmblemScene = {
  * Transparent canvas, so whatever is behind the wrapper shows through:
  * the hero's dark gradient in one case, the RSVP's white in the other.
  */
-export function createEmblemScene(wrap: HTMLElement): EmblemScene {
+export function createEmblemScene(wrap: HTMLElement): EmblemScene | null {
   const canvas = document.createElement("canvas");
   wrap.appendChild(canvas);
 
@@ -35,11 +35,29 @@ export function createEmblemScene(wrap: HTMLElement): EmblemScene {
   const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
   camera.position.set(0, 0, 5);
 
-  const renderer = new THREE.WebGLRenderer({
-    canvas,
-    antialias: true,
-    alpha: true,
-  });
+  // WebGL is not guaranteed. Hardware acceleration switched off, an older
+  // phone, a low-power mode, a browser under memory pressure — Safari in
+  // particular refuses a context rather than falling back to software, and
+  // three.js turns that refusal into a throw.
+  //
+  // Thrown from inside the effect that calls this, that throw unmounts the
+  // React tree and the guest gets "Application error: a client-side
+  // exception has occurred" instead of their invitation. An emblem that
+  // cannot spin is worth losing; the invitation is not.
+  //
+  // Returning null lets both callers skip the scene and leave the page
+  // otherwise intact.
+  let renderer: THREE.WebGLRenderer;
+  try {
+    renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: true,
+      alpha: true,
+    });
+  } catch {
+    canvas.remove();
+    return null;
+  }
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 

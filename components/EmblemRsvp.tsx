@@ -37,6 +37,8 @@ export function EmblemRsvp() {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const emblem = createEmblemScene(wrap);
+    // No WebGL: no emblem, but the reply card still works.
+    if (!emblem) return;
 
     let raf = 0;
     const update = () => {

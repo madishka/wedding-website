@@ -24,7 +24,12 @@ export function EmblemHero() {
     const wrap = wrapRef.current;
     if (!wrap) return;
 
-    const emblem = createEmblemScene(wrap);
+    const scene = createEmblemScene(wrap);
+    // No WebGL: no emblem, but the rest of the page still renders.
+    if (!scene) return;
+    // Rebound so the closures below see a non-null type without a `!` on
+    // every use.
+    const emblem = scene;
     window.addEventListener("resize", emblem.resize);
 
     const scrollSpace = document.querySelector<HTMLElement>(
