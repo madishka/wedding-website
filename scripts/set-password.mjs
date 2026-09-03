@@ -65,7 +65,7 @@ const db = createClient(url.trim().replace(/\/$/, ""), key, {
 const { data: households, error } = await db
   .from("parties")
   .select(
-    "id, import_key, display_name, token, contact_email, contact_phone, " +
+    "id, import_key, display_name, token, contact_email, " +
       "password_hash, password_set_at, guests ( name, sort_order )"
   )
   .order("display_name");
@@ -140,7 +140,6 @@ if (ALL) {
     rows.push([
       h.display_name,
       h.contact_email ?? "",
-      h.contact_phone ?? "",
       `${SITE_URL.replace(/\/$/, "")}/i/${h.token}`,
       password,
     ]);
@@ -157,7 +156,7 @@ if (ALL) {
   const outPath = path.join(outDir, "send-list.csv");
   writeFileSync(
     outPath,
-    [["household", "contact_email", "contact_phone", "link", "password"], ...rows]
+    [["household", "contact_email", "link", "password"], ...rows]
       .map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(","))
       .join("\n") + "\n",
     "utf8"

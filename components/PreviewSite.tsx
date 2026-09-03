@@ -28,7 +28,6 @@ const MOCK_PARTY: Party = {
   // that reads well on the links spreadsheet.
   displayName: "Carly & Brandon",
   contactEmail: "preview@example.com",
-  contactPhone: null,
   softResponse: null,
   softNote: null,
   hasPassword: false,

@@ -3,12 +3,12 @@ import { supabase } from "@/lib/supabase";
 import { isValidTokenFormat } from "@/lib/types";
 import type { Guest, Party, RsvpAnswer, WeddingEvent } from "@/lib/types";
 
-const SELECT_WITHOUT_PASSWORD = `id, token, display_name, contact_email, contact_phone,
+const SELECT_WITHOUT_PASSWORD = `id, token, display_name, contact_email,
    soft_response, soft_note,
    guests ( id, name, guest_type, sort_order ),
    party_events ( events ( * ) )`;
 
-const SELECT_WITH_PASSWORD = `id, token, display_name, contact_email, contact_phone,
+const SELECT_WITH_PASSWORD = `id, token, display_name, contact_email,
    soft_response, soft_note, password_hash, password_set_at,
    guests ( id, name, guest_type, sort_order ),
    party_events ( events ( * ) )`;
@@ -25,7 +25,6 @@ type PartyRow = {
   token: string;
   display_name: string;
   contact_email: string | null;
-  contact_phone: string | null;
   soft_response: "yes" | "no" | null;
   soft_note: string | null;
   password_hash?: string | null;
@@ -146,7 +145,6 @@ export async function getPartyByToken(token: string): Promise<Party | null> {
     token: data.token,
     displayName: data.display_name,
     contactEmail: data.contact_email,
-    contactPhone: data.contact_phone,
     softResponse: data.soft_response,
     softNote: data.soft_note,
     // Boolean, not the hash: see the note on Party.hasPassword.

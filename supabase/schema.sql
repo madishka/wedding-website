@@ -26,8 +26,6 @@ create table if not exists parties (
 
   display_name    text not null,          -- "Eric & Rebecca Chen"
   contact_email   text,
-  contact_phone   text,
-  invited_via     text,                   -- whatsapp | email | sms | ...
   notes           text,
 
   -- Invite tracking. With no paper trail, this is your "who haven't we
@@ -48,6 +46,18 @@ create table if not exists parties (
 );
 
 create index if not exists parties_token_idx on parties (token);
+
+-- ── Removed columns ───────────────────────────────────────────────────
+-- contact_phone and invited_via are gone: every invitation is sent by
+-- hand, so there was nothing to track and nothing reading them. Dropping
+-- rather than leaving them empty keeps the table honest about what it
+-- actually holds.
+--
+-- Idempotent like everything else here — a no-op on a fresh database.
+-- Run this only AFTER deploying code that no longer selects them, or the
+-- live site queries a column that isn't there any more.
+alter table parties drop column if exists contact_phone;
+alter table parties drop column if exists invited_via;
 
 -- ── The password (optional, per household) ────────────────────────────
 --

@@ -1,9 +1,9 @@
-Household,Contact Email,Contact Phone,Invited Via,Events,Guest Name,Guest Type,Notes
-EXAMPLE — delete this row,eric@example.com,+15551234567,whatsapp,wedding,Eric Chen,adult,One row per PERSON. Household fields only on the first row.
-EXAMPLE — delete this row,,,,,Rebecca Chen,adult,Same household name = same link. Leave the rest blank.
-EXAMPLE — delete this row,,,,,Mia Chen,child,adult / child / infant / plus_one
-EXAMPLE — single guest,sofia@example.com,,email,wedding,Sofia Marino,adult,
-Carly & Brandon,carly@example.com,,whatsapp,wedding,Carly Amsterdam,adult,"EXAMPLE — no shared surname. Household is internal, so name it whatever helps YOU find it."
-Carly & Brandon,,,,,Brandon,plus_one,"First name only is fine. Guests see ""Dear Carly and Brandon""."
-EXAMPLE — unknown plus one,tom@example.com,,email,wedding,Tom Whitfield,adult,
-EXAMPLE — unknown plus one,,,,,,plus_one,"Blank name allowed ONLY for plus_one. Shows as ""and guest""."
+Household,Contact Email,Events,Guest Name,Guest Type,Notes
+EXAMPLE — delete this row,eric@example.com,wedding,Eric Chen,adult,One row per PERSON.
+EXAMPLE — delete this row,,,Rebecca Chen,adult,"Blank Household = same household as the row above."
+EXAMPLE — delete this row,,,Mia Chen,child,adult / child / infant / plus_one
+EXAMPLE — single guest,sofia@example.com,wedding,Sofia Marino,adult,
+Carly & Brandon,carly@example.com,wedding,Carly Amsterdam,adult,"EXAMPLE — no shared surname. Household is internal, guests never see it."
+,,,Brandon,plus_one,"First name only is fine. Guests see ""Dear Carly and Brandon""."
+EXAMPLE — unknown plus one,tom@example.com,wedding,Tom Whitfield,adult,
+,,,,plus_one,"Blank name allowed ONLY for plus_one. Shows as ""and guest""."

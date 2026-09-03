@@ -122,8 +122,6 @@ records.forEach((rec, idx) => {
       import_key: key,
       display_name: rec.household,
       contact_email: null,
-      contact_phone: null,
-      invited_via: null,
       notes: null,
       // Plaintext, only ever held in memory long enough to hash.
       password: null,
@@ -134,8 +132,6 @@ records.forEach((rec, idx) => {
   const party = parties.get(key);
 
   party.contact_email ||= rec.contact_email || null;
-  party.contact_phone ||= rec.contact_phone || null;
-  party.invited_via ||= rec.invited_via || null;
   party.notes ||= rec.notes || null;
   if (HAS_PASSWORD_COL) party.password ||= rec.password || null;
 
@@ -179,7 +175,7 @@ if (CHECK) {
   console.log(`\n  ${csvPath}`);
   console.log(`  ${parties.size} households, ${records.length} guests\n`);
   for (const p of parties.values()) {
-    const contact = p.contact_email || p.contact_phone || "no contact!";
+    const contact = p.contact_email || "no email — you'll get it from their RSVP";
     console.log(`  ${p.display_name}  —  ${contact}`);
     console.log(`    events: ${p.eventSlugs.join(", ") || "none"}`);
     if (HAS_PASSWORD_COL) {
@@ -309,8 +305,6 @@ for (const p of [...toCreate, ...toUpdate]) {
     token: p.token,
     display_name: p.display_name,
     contact_email: p.contact_email,
-    contact_phone: p.contact_phone,
-    invited_via: p.invited_via,
     notes: p.notes,
   };
 
@@ -386,12 +380,10 @@ mkdirSync(outDir, { recursive: true });
 const outPath = path.join(outDir, "links.csv");
 
 const csvOut = [
-  ["household", "contact_email", "contact_phone", "invited_via", "guests", "link", "password"],
+  ["household", "contact_email", "guests", "link", "password"],
   ...[...toCreate, ...toUpdate].map((p) => [
     p.display_name,
     p.contact_email ?? "",
-    p.contact_phone ?? "",
-    p.invited_via ?? "",
     String(p.guests.length),
     `${SITE_URL.replace(/\/$/, "")}/i/${p.token}`,
     // The link and the password, side by side, ready to paste into one

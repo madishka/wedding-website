@@ -39,7 +39,6 @@ export type Party = {
   token: string;
   displayName: string;
   contactEmail: string | null;
-  contactPhone: string | null;
   /** Wave-one save-the-date reply. Null = not answered yet. */
   softResponse: "yes" | "no" | null;
   softNote: string | null;

@@ -87,9 +87,7 @@ The columns:
 | `Household` | **yes** | Groups people onto one link. Repeat it on every row of that household. **Internal — guests never see it.** |
 | `Guest Name` | **yes** | One row per person. Blank only for an unnamed plus-one. |
 | `Guest Type` | | `adult` / `child` / `infant` / `plus_one`. Defaults to `adult`. |
-| `Contact Email` | | Where the real invitation goes. First row of the household only. |
-| `Contact Phone` | | First row of the household only. |
-| `Invited Via` | | `whatsapp` / `email` / `sms` — just a note to yourself. |
+| `Contact Email` | | Optional — **the RSVP asks each household to confirm their email and writes it back here**, so you don't need it up front. |
 | `Events` | | Slugs separated by `;` — `wedding;boat-party`. See below. |
 | `Notes` | | Anything. Never shown to guests. |
 
