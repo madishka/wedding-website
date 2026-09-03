@@ -41,7 +41,8 @@
 import { createClient } from "@supabase/supabase-js";
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import path from "node:path";
-import { mintToken, parseCsv, normalizeKey, toCsvUrl } from "./lib/import-utils.mjs";
+import { mintToken, parseCsv, normalizeKey, toCsvUrl, fillDownHouseholds }
+  from "./lib/import-utils.mjs";
 import { hashPassword, verifyPassword } from "./lib/password-utils.mjs";
 
 // ── Args ──────────────────────────────────────────────────────────────
@@ -95,11 +96,13 @@ for (const col of need) {
 // passwords later — or never — costs nothing.
 const HAS_PASSWORD_COL = header.includes("password");
 
-const records = rows.slice(1).map((cells) => {
-  const rec = {};
-  header.forEach((h, i) => (rec[h] = (cells[i] ?? "").trim()));
-  return rec;
-});
+const records = fillDownHouseholds(
+  rows.slice(1).map((cells) => {
+    const rec = {};
+    header.forEach((h, i) => (rec[h] = (cells[i] ?? "").trim()));
+    return rec;
+  })
+);
 
 /** Group rows into households. Household-level fields come from whichever
  *  row supplies them first, so the spreadsheet only needs them once. */

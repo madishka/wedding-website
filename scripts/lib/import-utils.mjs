@@ -78,3 +78,25 @@ export function toCsvUrl(source) {
   const gid = String(source).match(/[#&?]gid=([0-9]+)/)?.[1] ?? "0";
   return `https://docs.google.com/spreadsheets/d/${m[1]}/export?format=csv&gid=${gid}`;
 }
+
+/**
+ * Fill the Household column downwards.
+ *
+ * A blank Household means "same household as the row above" — which is how
+ * people actually fill in a spreadsheet, and what you get for free by
+ * dragging one row down. Requiring it on every row made the second person in
+ * every household an error, which is a bad trade for a column whose whole
+ * job is to say "these people are together".
+ *
+ * Only the FIRST rows can genuinely lack a household, since there is nothing
+ * above them to inherit from; those are left blank for the caller to report.
+ *
+ * Mutates nothing — returns new records.
+ */
+export function fillDownHouseholds(records) {
+  let last = "";
+  return records.map((rec) => {
+    if (rec.household) last = rec.household;
+    return rec.household ? rec : { ...rec, household: last };
+  });
+}

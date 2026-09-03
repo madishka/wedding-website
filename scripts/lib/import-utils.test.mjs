@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mintToken, parseCsv, normalizeKey, toCsvUrl, ALPHABET, TOKEN_LENGTH }
-  from "./import-utils.mjs";
+import { mintToken, parseCsv, normalizeKey, toCsvUrl, fillDownHouseholds,
+  ALPHABET, TOKEN_LENGTH } from "./import-utils.mjs";
 
 test("parseCsv keeps commas inside quoted fields", () => {
   const rows = parseCsv('a,b,c\n1,"boat-party,wedding",3\n');
@@ -103,4 +103,40 @@ test("toCsvUrl leaves a non-Sheets URL alone", () => {
   ]) {
     assert.equal(toCsvUrl(url), url);
   }
+});
+
+test("a blank household means the same household as the row above", () => {
+  // How a spreadsheet actually gets filled in: the name on the first row of
+  // the household, blank underneath.
+  const filled = fillDownHouseholds([
+    { household: "Eric & Rebecca Chen", guest_name: "Eric Chen" },
+    { household: "", guest_name: "Rebecca Chen" },
+    { household: "", guest_name: "Mia Chen" },
+    { household: "Aunt Sofia", guest_name: "Sofia Marino" },
+    { household: "", guest_name: "" },
+  ]);
+  assert.deepEqual(filled.map((r) => r.household), [
+    "Eric & Rebecca Chen",
+    "Eric & Rebecca Chen",
+    "Eric & Rebecca Chen",
+    "Aunt Sofia",
+    "Aunt Sofia",
+  ]);
+});
+
+test("fillDownHouseholds leaves leading blanks blank to be reported", () => {
+  // Nothing above to inherit from, so this stays an error rather than
+  // silently inventing a household.
+  const filled = fillDownHouseholds([
+    { household: "", guest_name: "Orphan" },
+    { household: "Chens", guest_name: "Eric" },
+  ]);
+  assert.equal(filled[0].household, "");
+  assert.equal(filled[1].household, "Chens");
+});
+
+test("fillDownHouseholds does not mutate the rows it is given", () => {
+  const original = [{ household: "Chens" }, { household: "" }];
+  fillDownHouseholds(original);
+  assert.equal(original[1].household, "");
 });

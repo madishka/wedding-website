@@ -96,7 +96,9 @@ The columns:
 Three rules the importer enforces, so it's worth knowing them up front:
 
 - **Household-level fields only need filling on the first row** of each
-  household. Leave them blank on the rest.
+  household — including `Household` itself. A blank `Household` means "same
+  household as the row above", so filling the name in once and leaving the
+  rows beneath it blank is exactly right.
 - **The household name is never shown to guests.** It groups people onto a
   link and it is how re-imports match, nothing more. The site addresses
   people by their own first names — the welcome note says "Dear Carly and
