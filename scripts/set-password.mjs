@@ -21,10 +21,22 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
-import { randomInt } from "node:crypto";
+
 import path from "node:path";
 import { normalizeKey } from "./lib/import-utils.mjs";
 import { hashPassword } from "./lib/password-utils.mjs";
+
+/**
+ * Passwords are <first names, joined><year> — "maddiephilip2027", "jack2027".
+ *
+ * Guessable by anyone who knows who the household is, and that is a
+ * deliberate trade. The password is a second curtain over a link that is
+ * already 109 unguessable bits; its job is to stop a bare URL that leaks on
+ * its own from opening, and whoever holds that URL has no idea whose it is
+ * (the gate shows no names). What it buys in return is a password nobody
+ * has to write down, which is worth more here than entropy.
+ */
+const WEDDING_YEAR = 2027;
 
 const args = process.argv.slice(2);
 const LIST = args.includes("--list");
@@ -33,6 +45,9 @@ const ALL = args.includes("--all");
 const positional = args.filter((a) => !a.startsWith("--"));
 
 loadEnvLocal();
+
+// Same source the importer uses to build links, so the two agree.
+const SITE_URL = process.env.SITE_URL ?? "http://localhost:3000";
 
 const url = process.env.SUPABASE_URL;
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -48,7 +63,10 @@ const db = createClient(url.trim().replace(/\/$/, ""), key, {
 
 const { data: households, error } = await db
   .from("parties")
-  .select("id, import_key, display_name, password_hash, password_set_at")
+  .select(
+    "id, import_key, display_name, token, contact_email, contact_phone, " +
+      "password_hash, password_set_at, guests ( name, sort_order )"
+  )
   .order("display_name");
 if (error) {
   // The most likely reason by far, and the raw Postgres error is no help.
@@ -95,27 +113,39 @@ if (ALL) {
 
   const rows = [];
   for (const h of missing) {
-    const password = generatePassword(h.display_name);
+    const password = generatePassword(h);
     await write(h, password);
-    rows.push([h.display_name, password]);
+    rows.push([
+      h.display_name,
+      h.contact_email ?? "",
+      h.contact_phone ?? "",
+      `${SITE_URL.replace(/\/$/, "")}/i/${h.token}`,
+      password,
+    ]);
     console.log(`  \x1b[32m✓\x1b[0m ${h.display_name}  →  ${password}`);
   }
 
+  // Link and password side by side, with the contact details, so this one
+  // file is everything you need to actually send the invitations. Only the
+  // households that just got a password are in it — the ones you still have
+  // to message — which is what makes re-running this after each batch
+  // produce exactly the next send list.
   const outDir = path.join("scripts", "out");
   mkdirSync(outDir, { recursive: true });
-  const outPath = path.join(outDir, "passwords.csv");
+  const outPath = path.join(outDir, "send-list.csv");
   writeFileSync(
     outPath,
-    [["household", "password"], ...rows]
+    [["household", "contact_email", "contact_phone", "link", "password"], ...rows]
       .map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(","))
       .join("\n") + "\n",
     "utf8"
   );
 
   console.log(`\n  ✓ ${rows.length} passwords set`);
-  console.log(`  ✓ written to ${outPath}`);
-  console.log(`\n  That file is the only plaintext copy. It is gitignored —`);
-  console.log(`  keep it somewhere you'll still have it in a year.\n`);
+  console.log(`  ✓ send list → ${outPath}`);
+  console.log(`\n  That file has every link AND the only plaintext copy of`);
+  console.log(`  each password. It is gitignored — keep it somewhere you'll`);
+  console.log(`  still have it in a year, and don't paste it anywhere shared.\n`);
   process.exit(0);
 }
 
@@ -166,10 +196,11 @@ if (CLEAR) {
   process.exit(0);
 }
 
-const password = passwordArg || generatePassword(match.display_name);
+const password = passwordArg || generatePassword(match);
 await write(match, password);
 
 console.log(`\n  ✓ ${match.display_name}`);
+console.log(`    link:     ${SITE_URL.replace(/\/$/, "")}/i/${match.token}`);
 console.log(`    password: \x1b[1m${password}\x1b[0m`);
 if (match.password_hash) {
   console.log(`\n  This replaced their old password, so anyone already`);
@@ -199,11 +230,26 @@ async function write(household, password) {
  * name alone, which is the only guessing that realistically matters here:
  * you already need the 109-bit link to reach the password prompt at all.
  */
-function generatePassword(displayName) {
-  const words = normalizeKey(displayName).split("-").filter(Boolean);
-  // Last word is the surname in "Eric & Rebecca Chen" and in "Aunt Sofia".
-  const stem = words[words.length - 1] ?? "guest";
-  return `${stem}${randomInt(100, 1000)}`;
+function generatePassword(household) {
+  const names = (household.guests ?? [])
+    .slice()
+    .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+    // Unnamed plus-one slots are skipped entirely, so "Jack + a guest we
+    // haven't been told about" gets the same password as Jack alone.
+    .filter((g) => g.name)
+    // Strip accents, spaces and hyphens: the password has to survive being
+    // read down a phone and retyped. "José" → "jose", "Mary-Anne" →
+    // "maryanne". normalizeKey does the folding; we drop its separators.
+    .map((g) => normalizeKey(String(g.name).trim().split(/\s+/)[0]).replace(/-/g, ""))
+    .filter(Boolean);
+
+  // Nobody named at all — fall back to the household's own name so we never
+  // generate the bare year as a password.
+  const stem = names.length
+    ? names.join("")
+    : normalizeKey(household.display_name).replace(/-/g, "") || "guest";
+
+  return `${stem}${WEDDING_YEAR}`;
 }
 
 function loadEnvLocal() {

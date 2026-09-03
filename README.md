@@ -223,11 +223,40 @@ npm run password -- --all                         # generate for everyone
 Partial names work — `npm run password -- chen` finds the Chens, and says
 so if it matches more than one household.
 
-`--all` is the usual first move: it generates a `surname` + three digits
-password for every household that hasn't got one, and writes them to
-`scripts/out/passwords.csv`. **That file is the only plaintext copy.**
-Hashes are one-way, so a lost password can only be replaced, never read
-back — `--list` will tell you a password exists but never what it is.
+`--all` is the usual first move: it gives a password to every household
+that hasn't got one, and skips the ones that have — so re-running it after
+each new batch of guests only touches the new arrivals.
+
+Generated passwords are **everyone's first names, joined, then the year**:
+
+| Household | Password |
+| --- | --- |
+| Maddie and Philip | `maddiephilip2027` |
+| Jack, on his own | `jack2027` |
+| Jack + a plus-one whose name we don't know | `jack2027` |
+| Carly Amsterdam and Brandon | `carlybrandon2027` |
+
+Unnamed plus-one slots are skipped, so a household with a nameless +1 gets
+the same password as if they had none. Accents and hyphens are folded —
+"José" is `jose`, "Mary-Anne" is `maryanne` — because the password has to
+survive being read down a phone and retyped.
+
+These are guessable by anyone who knows who the household is, and that is
+deliberate. The password is a second curtain over a link that is already
+109 unguessable bits; its job is to stop a bare URL that leaks on its own
+from opening, and whoever holds a leaked URL doesn't know whose it is,
+because the gate shows no names. In exchange nobody has to write anything
+down, which is worth more here than entropy. Set a specific password on
+any household you'd rather do differently.
+
+Each `--all` run writes **`scripts/out/send-list.csv`** — household, email,
+phone, link and password in one row, which is everything you need to
+actually send an invitation. Only the households that just got a password
+are in it, so it is precisely the list of people you still have to message.
+
+**That file is the only plaintext copy of the passwords.** Hashes are
+one-way, so a lost password can only be replaced, never read back —
+`--list` will tell you a password exists but never what it is.
 
 > `scripts/guests.csv` and `scripts/out/` are gitignored, and they hold
 > plaintext passwords. That is a deliberate trade: these are curtains over
