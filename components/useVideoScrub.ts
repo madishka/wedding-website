@@ -102,6 +102,11 @@ export function useVideoScrub(
     };
 
     const seek = (time: number) => {
+      // A non-finite time throws on assignment to currentTime, which is an
+      // uncaught TypeError inside an effect — React then unmounts the tree
+      // and the whole page becomes "Application error". A frame we cannot
+      // compute is never worth a blank page, so drop the seek instead.
+      if (!Number.isFinite(time)) return;
       const quantised = Math.round(time / frameDuration) * frameDuration;
       if (Math.abs(quantised - lastSeeked) < frameDuration / 2) return;
       if (seekBusy) {

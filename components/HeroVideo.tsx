@@ -49,6 +49,10 @@ export function HeroVideo({
     const range =
       (runway?.offsetHeight ?? 0) + (curtain ? window.innerHeight : 0) ||
       window.innerHeight;
+    // Both terms are zero in a zero-height viewport — a hidden pane, a
+    // collapsed iframe, some link-preview crawlers — and then the `||`
+    // fallback is zero too, making this 0/0 = NaN.
+    if (!(range > 0)) return 0;
     return clamp(window.scrollY / range, 0, 1);
   }, [runwaySelector, curtain]);
 

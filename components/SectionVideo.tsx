@@ -133,7 +133,11 @@ export function SectionVideo({
     if (!wrap) return 0;
     const rect = wrap.getBoundingClientRect();
     const vh = window.innerHeight;
-    const p = clamp((vh - rect.top) / (vh + rect.height), 0, 1);
+    // Same zero-height case as HeroVideo: vh and rect.height are both 0,
+    // so this divides zero by zero.
+    const span = vh + rect.height;
+    if (!(span > 0)) return 0;
+    const p = clamp((vh - rect.top) / span, 0, 1);
     if (!curve) return p;
     const mix = clamp(curveMix, 0, 1);
     return applyCurve(curve, p) * mix + p * (1 - mix);
