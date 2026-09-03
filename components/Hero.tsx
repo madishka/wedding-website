@@ -1,7 +1,7 @@
 import { siteConfig } from "@/lib/site-config";
 import { EmblemHero } from "./EmblemHero";
 import { HeroMotion } from "./HeroMotion";
-import { HeroVideo } from "./HeroVideo";
+import { HeroVideo, type HeroVideoSources } from "./HeroVideo";
 
 export type HeroBackdrop = "image" | "video";
 
@@ -39,9 +39,12 @@ function buildNav() {
 export function Hero({
   showDetails = true,
   backdrop = "image",
+  videoSources,
 }: {
   showDetails?: boolean;
   backdrop?: HeroBackdrop;
+  /** Encode variant override for the video backdrop (A/B testing). */
+  videoSources?: HeroVideoSources;
 }) {
   const { couple, dateLabel, placeLabel } = siteConfig;
   const useVideo = backdrop === "video";
@@ -53,6 +56,7 @@ export function Hero({
         <HeroVideo
           runwaySelector={showDetails ? ".hero-scroll-space" : ".emblem-scroll-space"}
           curtain={showDetails}
+          sources={videoSources}
         />
       ) : (
         /*

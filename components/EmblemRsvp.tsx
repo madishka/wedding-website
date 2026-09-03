@@ -41,9 +41,12 @@ export function EmblemRsvp() {
     if (!emblem) return;
 
     let raf = 0;
+    let lastP = -1;
     const update = () => {
       raf = 0;
       if (reduceMotion) {
+        if (lastP === 0) return;
+        lastP = 0;
         emblem.setRotation(0);
         wrap.style.opacity = "1";
       } else {
@@ -55,6 +58,11 @@ export function EmblemRsvp() {
           0,
           1
         );
+        // Skip the WebGL render when nothing changed — this listener
+        // fires for every scroll on the page, most of it nowhere near
+        // this section (p pinned at 0 or 1).
+        if (p === lastP) return;
+        lastP = p;
         emblem.setRotation(p * Math.PI);
         wrap.style.opacity = String(clamp(p / FADE_PORTION, 0, 1));
       }

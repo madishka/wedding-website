@@ -34,12 +34,26 @@
 
 html {
   scroll-behavior: smooth;
+  /* No scroll anchoring — and it must live on html: for the root
+     scroller Chrome reads it from the scrolling element, not body.
+     The scene backdrops are viewport-sized sticky layers translated
+     every frame during the cross-dissolves, and anchoring sometimes
+     "compensates" for those transforms by yanking the scroll position
+     back up. Every motion here is scroll-driven; anchoring has
+     nothing legitimate to protect. */
+  overflow-anchor: none;
 }
 
 body {
   /* The darkest section tone, not paper: every surface on the site is
      dark now, so overscroll and pre-paint flashes should be too. */
   background: #0b1117;
+  /* No scroll anchoring: the scene backdrops are viewport-sized sticky
+     layers translated every frame during the cross-dissolves, and
+     Chrome's anchoring sometimes "compensates" for those transforms by
+     yanking the scroll position back up. Every motion on this page is
+     scroll-driven, so anchoring has nothing legitimate to protect. */
+  overflow-anchor: none;
   color: var(--ink);
   font-family: var(--font-body), sans-serif;
   font-weight: 300;
@@ -491,18 +505,33 @@ body::after {
   position: relative;
 }
 
+/* Extends ONE VIEWPORT above and below its wrapper, so the sticky
+   layer inside is pinned by the browser's own sticky positioning a
+   viewport early (the entrance dissolve happens over a full-screen,
+   natively-pinned layer) and released a viewport late (the outgoing
+   scene holds still while the next one fades over it). All positioning
+   is native — JS only drives the fade (useSceneDissolve.ts); JS-driven
+   position corrections lag the compositor by a frame and jitter.
+   No pointer events: the layer covers the viewport (invisibly) before
+   its scene starts and would swallow clicks meant for the hero nav. */
 .mid-backdrop {
   position: absolute;
-  inset: 0;
+  top: -100vh;
+  bottom: -100vh;
+  left: 0;
+  right: 0;
   z-index: 0;
-  /* No overflow clip: during the entrance cross-dissolve the sticky
-     layer is offset upward past the wrapper's top edge so the incoming
-     scene covers the whole viewport while it fades in over the hero
-     (SectionVideo.tsx). Clipping would cut that off at the wrapper.
-     And no pointer events for the whole layer: the entry offset parks
-     it (invisibly, opacity 0) over the viewport before its scene
-     starts — without this it swallows clicks meant for the hero nav. */
   pointer-events: none;
+}
+
+/* The finale is the last scene: nothing dissolves in over it (the
+   footer just scrolls up across it, then the page ends), so its
+   backdrop needs no downward extension — and a -100vh one would add a
+   dead viewport of scroll past the footer. Reaching the wrapper's own
+   bottom is enough: sticky keeps the scene pinned across the footer's
+   rise, since the footer is only a fraction of a viewport tall. */
+.fin .mid-backdrop {
+  bottom: 0;
 }
 
 .mid-backdrop-sticky {
@@ -520,15 +549,13 @@ body::after {
   pointer-events: none;
 }
 
-/* The entrance cross-dissolve (useSceneDissolve.ts drives opacity and
-   the viewport-aligning offset). overflow: clip contains anything
+/* The entrance cross-dissolve (useSceneDissolve.ts drives opacity;
+   position is pure native sticky). overflow: clip contains anything
    scaled inside — the still's Ken Burns zoom overflows its box by up
-   to ~5%, and unclipped that spill hangs below the document end,
-   visible in Safari's elastic bounce past the footer. (clip, not
-   hidden: hidden would make this a scroll container and break the
-   sticky descendants' geometry assumptions.) */
+   to ~5%. (clip, not hidden: hidden would make this a scroll container
+   and break the sticky descendants' geometry assumptions.) */
 .mid-backdrop-sticky {
-  will-change: opacity, transform;
+  will-change: opacity;
   overflow: clip;
 }
 
@@ -559,11 +586,15 @@ body::after {
   box-shadow: none;
 }
 
+/* Tinted, not frosted: backdrop-filter over a backdrop that TRANSFORMS
+   every scroll frame (the scrubbing clip, the Ken Burns still) forces
+   the compositor to recompute the blur per card per frame — heavy
+   scroll jank on Chrome and mobile Safari, worst where the surface is
+   biggest. A deeper tint reads nearly the same over footage this dark
+   and costs nothing. */
 .mid .event-card {
-  background: rgba(11, 17, 23, 0.45);
+  background: rgba(13, 19, 26, 0.72);
   border-color: rgba(255, 255, 255, 0.18);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
 }
 
 /* WebKit won't render a backdrop-filter while an ancestor's opacity is
@@ -578,7 +609,7 @@ body::after {
 }
 
 .mid .event-card:not(.featured):hover {
-  background: rgba(11, 17, 23, 0.62);
+  background: rgba(13, 19, 26, 0.85);
 }
 
 /* Section headings sit directly on the footage — lift them off the
@@ -603,10 +634,8 @@ body::after {
    blur. Its text goes back to light (the global featured rules assume
    the light slab). */
 .mid .event-card.featured {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.16);
   border-color: rgba(255, 255, 255, 0.6);
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
   color: var(--ink);
 }
 
@@ -890,16 +919,17 @@ body::after {
 /* The reply card: one frosted surface over the terrace clip, holding
    the crest, the greeting by name, the deadline and the form. The
    form re-left-aligns its own innards for scannability. */
+/* Tinted, not frosted — same Chrome-perf reasoning as .mid .event-card:
+   this is the biggest surface on the page, sitting over the Ken Burns
+   still that transforms every scroll frame. */
 .rsvp-card {
   max-width: 36rem;
   margin-inline: auto;
   padding: clamp(1.8rem, 3.5vw, 2.5rem) clamp(1.5rem, 4vw, 3rem);
   text-align: center;
-  background: rgba(11, 17, 23, 0.55);
+  background: rgba(13, 19, 26, 0.82);
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 2px;
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
 }
 
 .rsvp-card form {

@@ -9,6 +9,11 @@ function clamp(value: number, min: number, max: number) {
 }
 
 export type MidVideoConfig = {
+  /** Optional AV1 source, listed after HEVC — for browsers without
+   *  HEVC decode (Firefox, most Windows/Android Chrome), ~40% smaller
+   *  than the H.264 they'd otherwise fall back to. */
+  av1Src?: string;
+  av1Type?: string;
   hevcSrc: string;
   /** Exact codec string read from the encoded file (see encode script). */
   hevcType: string;
@@ -60,6 +65,8 @@ const OIA_SEGMENT_CURVE = [
  * at full flattening read as frozen.
  */
 const DEFAULT_CONFIG: MidVideoConfig = {
+  av1Src: "/mid-oia-av1.mp4",
+  av1Type: 'video/mp4; codecs="av01.0.09M.08"',
   hevcSrc: "/mid-oia-hevc.mp4",
   hevcType: 'video/mp4; codecs="hvc1.1.6.L123.B0"',
   h264Src: "/mid-oia.mp4",
@@ -133,7 +140,11 @@ export function SectionVideo({
           io.disconnect();
         }
       },
-      { rootMargin: "25% 0px" }
+      // 50%: for this layout that means the first real scroll gesture
+      // triggers the fetch — still deferred out of the initial page
+      // load, but the heavyweight load() (demux init, network start)
+      // happens far away from the dissolve zone instead of inside it.
+      { rootMargin: "50% 0px" }
     );
     io.observe(wrap);
     return () => io.disconnect();
@@ -173,7 +184,12 @@ export function SectionVideo({
           disableRemotePlayback
           tabIndex={-1}
         >
+          {/* HEVC before AV1: hardware decode wherever available — see
+              the ordering rationale in HeroVideo.tsx. */}
           <source src={config.hevcSrc} type={config.hevcType} />
+          {config.av1Src && (
+            <source src={config.av1Src} type={config.av1Type} />
+          )}
           <source src={config.h264Src} type="video/mp4" />
         </video>
         <div className="mid-video-scrim" />

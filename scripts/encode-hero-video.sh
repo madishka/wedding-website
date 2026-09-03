@@ -37,7 +37,7 @@ INTERP="minterpolate=fps=59.94:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1"
 echo "→ H.264 (universal)"
 "$FFMPEG" -v error -y -i "$SRC" -an \
   -vf "$INTERP" \
-  -c:v libx264 -preset veryslow -crf 20 \
+  -c:v libx264 -preset veryslow -crf 22 \
   -g 6 -keyint_min 6 -bf 0 -sc_threshold 0 \
   -pix_fmt yuv420p -movflags +faststart \
   "$OUT_DIR/hero-caldera.mp4"
@@ -45,10 +45,17 @@ echo "→ H.264 (universal)"
 echo "→ HEVC (Safari / iOS / macOS Chrome)"
 "$FFMPEG" -v error -y -i "$SRC" -an \
   -vf "$INTERP" \
-  -c:v libx265 -preset slow -crf 23 \
+  -c:v libx265 -preset slow -crf 25 \
   -x265-params keyint=6:min-keyint=6:bframes=0:scenecut=0:log-level=error \
   -tag:v hvc1 -pix_fmt yuv420p -movflags +faststart \
   "$OUT_DIR/hero-caldera-hevc.mp4"
+
+echo "→ AV1 (browsers without HEVC: Firefox, most Windows/Android Chrome)"
+"$FFMPEG" -v error -y -i "$SRC" -an \
+  -vf "$INTERP" \
+  -c:v libaom-av1 -crf 32 -b:v 0 -cpu-used 5 \
+  -g 6 -keyint_min 6 -pix_fmt yuv420p -movflags +faststart \
+  "$OUT_DIR/hero-caldera-av1.mp4"
 
 echo "→ poster (first frame)"
 "$FFMPEG" -v error -y -i "$SRC" \
