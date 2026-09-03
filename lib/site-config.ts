@@ -111,7 +111,7 @@ export const siteConfig = {
      *  personalized greeting is the card's title. */
     greeting: "Dear",
     paragraphs: [
-      "We would love to celebrate with you! Please reply so we can get an early sense for the numbers.",
+      "We would love to celebrate with you! We're asking this early just to get a rough sense of numbers.",
     ],
   },
 };

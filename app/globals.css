@@ -1156,6 +1156,15 @@ body::after {
   cursor: not-allowed;
 }
 
+/* The note under the yes/no buttons. Sits closer to the options than a
+   normal caption, since it is a rule about the choice directly above it —
+   but keeps .fine-print's centring so it reads as part of the same set of
+   captions as the one under the email field. */
+.option-note {
+  margin-top: 0.85rem;
+  line-height: 1.55;
+}
+
 .fine-print {
   margin-top: 0.9rem;
   text-align: center;

@@ -90,7 +90,7 @@ export function SoftRsvp({
             <h3 className="rsvp-title">Thank you</h3>
             <p>
               {response === "yes"
-                ? "That's all we need for now — go ahead and hold the dates. We'll be in touch with the full details, and you'll reply properly then."
+                ? "That's all we need for now — go ahead and pencil us in. Nothing is confirmed until the real invitation comes this autumn."
                 : "Thank you for letting us know so early. It genuinely helps."}
             </p>
             <p className="fine-print">
@@ -136,7 +136,13 @@ export function SoftRsvp({
           <div>
           <form onSubmit={onSubmit}>
             <fieldset className="field">
-              <legend>Can {guestNames} come?</legend>
+              <legend>
+                {/* "Are Jack hoping to join us?" is wrong, and a household
+                    can be a single person. The names are worth keeping, so
+                    the verb agrees with them rather than being dropped. */}
+                {/ and |,/.test(guestNames) ? "Are" : "Is"} {guestNames}{" "}
+                hoping to join us?
+              </legend>
               <div className="option-stack" role="radiogroup">
                 <button
                   type="button"
@@ -145,7 +151,7 @@ export function SoftRsvp({
                   className={`option ${response === "yes" ? "selected" : ""}`}
                   onClick={() => setResponse("yes")}
                 >
-                  <span>We&apos;re planning to be there</span>
+                  <span>Yes &mdash; we&apos;re hoping to be there</span>
                   <span className="option-emoji" aria-hidden="true">
                     {response === "yes" ? "😍" : ""}
                   </span>
@@ -157,12 +163,23 @@ export function SoftRsvp({
                   className={`option ${response === "no" ? "selected" : ""}`}
                   onClick={() => setResponse("no")}
                 >
-                  <span>Sadly, we can&apos;t make it</span>
+                  <span>No &mdash; we already know we can&apos;t</span>
                   <span className="option-emoji" aria-hidden="true">
                     {response === "no" ? "💔" : ""}
                   </span>
                 </button>
               </div>
+              {/* The rule, stated where the choice is actually made: a yes
+                  is not a commitment, so anyone unsure lands on yes and a no
+                  means a real no. That is the only signal we need now.
+
+                  Each piece of reassurance is said in exactly one place. The
+                  intro above covers WHY we're asking; this covers HOW to
+                  answer; TravelStay handles "don't book anything yet". */}
+              <p className="fine-print option-note">
+                Say yes if there&apos;s a good chance &mdash; nothing is
+                settled this far out, and you can change your answer any time.
+              </p>
             </fieldset>
 
             <div className="field">
