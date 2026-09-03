@@ -227,6 +227,14 @@ so if it matches more than one household.
 that hasn't got one, and skips the ones that have — so re-running it after
 each new batch of guests only touches the new arrivals.
 
+> **Set `SITE_URL` in `.env.local` to the real site before running `--all`.**
+> A generated password exists in plaintext exactly once, in the send list it
+> writes, because the database only ever stores a one-way hash. Run it while
+> `SITE_URL` still says `localhost` and that single copy is paired with links
+> nobody can open — and re-running won't fix it, because those households now
+> have passwords and get skipped. The script refuses to run in that state;
+> pass `--local` if you really are just testing.
+
 Generated passwords are **everyone's first names, joined, then the year**:
 
 | Household | Password |

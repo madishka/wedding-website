@@ -42,6 +42,7 @@ const args = process.argv.slice(2);
 const LIST = args.includes("--list");
 const CLEAR = args.includes("--clear");
 const ALL = args.includes("--all");
+const LOCAL_OK = args.includes("--local");
 const positional = args.filter((a) => !a.startsWith("--"));
 
 loadEnvLocal();
@@ -105,6 +106,27 @@ if (LIST) {
 
 // ── --all ─────────────────────────────────────────────────────────────
 if (ALL) {
+  // The one genuinely awkward mistake in this whole flow.
+  //
+  // A generated password exists in plaintext exactly once — in the send list
+  // written below — because what goes in the database is a one-way hash.
+  // Run this with SITE_URL still pointing at localhost and that single copy
+  // is paired with links nobody can open, and re-running won't help: these
+  // households now HAVE passwords, so --all will skip them and write
+  // nothing. You'd be joining two spreadsheets by hand to recover.
+  //
+  // Cheaper to stop here and ask.
+  if (/localhost|127\.0\.0\.1/.test(SITE_URL) && !LOCAL_OK) {
+    fail(
+      `SITE_URL is ${SITE_URL}, so every link in the send list would be\n` +
+        `a localhost address no guest can open.\n\n` +
+        `Set SITE_URL in .env.local to the real site first — the passwords\n` +
+        `are only ever written out once, when they're generated.\n\n` +
+        `Just testing? Re-run with --local:\n` +
+        `  npm run password -- --all --local`
+    );
+  }
+
   const missing = households.filter((h) => !h.password_hash);
   if (!missing.length) {
     console.log("\n  Every household already has a password. Nothing to do.\n");
